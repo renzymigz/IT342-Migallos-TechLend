@@ -13,6 +13,7 @@ export default function Register() {
   const { register } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState("")
+  const [success, setSuccess] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
   const [formData, setFormData] = useState({
@@ -31,10 +32,12 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError("")
+    setSuccess("")
     setIsLoading(true)
     try {
       await register(formData)
-      navigate("/login")
+      setSuccess("Account created successfully! Redirecting to login...")
+      setTimeout(() => navigate("/login"), 2000)
     } catch (err) {
       const apiError = err.response?.data?.error
       const msg = apiError?.message || "Registration failed. Please try again."
@@ -66,6 +69,11 @@ export default function Register() {
             {error && (
               <div className="rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
                 {error}
+              </div>
+            )}
+            {success && (
+              <div className="rounded-lg border border-green-500/50 bg-green-500/10 px-4 py-3 text-sm text-green-700 dark:text-green-400">
+                {success}
               </div>
             )}
 
@@ -115,10 +123,8 @@ export default function Register() {
             {/* Optional Fields */}
             <div className="grid grid-cols-2 gap-3">
               <div className="flex flex-col gap-2">
-                <Label htmlFor="reg-school-id">
-                  School ID <span className="text-muted-foreground font-normal">(Optional)</span>
-                </Label>
-                <Input id="reg-school-id" name="schoolId" placeholder="e.g., 20-1234-567" value={formData.schoolId} onChange={handleChange} />
+                <Label htmlFor="reg-school-id">School ID</Label>
+                <Input id="reg-school-id" name="schoolId" placeholder="e.g., 20-1234-567" value={formData.schoolId} onChange={handleChange} required />
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="reg-contact">
