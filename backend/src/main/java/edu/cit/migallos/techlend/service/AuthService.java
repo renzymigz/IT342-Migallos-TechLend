@@ -13,6 +13,7 @@ import edu.cit.migallos.techlend.enums.Role;
 import edu.cit.migallos.techlend.enums.UserStatus;
 import edu.cit.migallos.techlend.repository.UserRepository;
 import edu.cit.migallos.techlend.security.JwtUtil;
+import edu.cit.migallos.techlend.security.TokenBlacklistService;
 
 @Service
 public class AuthService {
@@ -20,13 +21,16 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final TokenBlacklistService tokenBlacklistService;
 
     public AuthService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
-                       JwtUtil jwtUtil) {
+                       JwtUtil jwtUtil,
+                       TokenBlacklistService tokenBlacklistService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
+        this.tokenBlacklistService = tokenBlacklistService;
     }
 
     public AuthResponse register(RegisterRequest request) {
@@ -65,6 +69,12 @@ public class AuthService {
         }
 
         return buildAuthResponse(user);
+    }
+
+    public void logout(String token) {
+        if (jwtUtil.isTokenValid(token)) {
+            tokenBlacklistService.blacklist(token, jwtUtil.extractExpiration(token));
+        }
     }
 
     private AuthResponse buildAuthResponse(User user) {

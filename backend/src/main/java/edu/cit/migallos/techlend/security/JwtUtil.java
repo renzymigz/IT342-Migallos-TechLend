@@ -74,4 +74,8 @@ public class JwtUtil {
     public String extractEmail(String token) {
         return parseToken(token).get("email", String.class);
     }
+
+    public java.util.Date extractExpiration(String token) {
+        return parseToken(token).getExpiration();
+    }
 }

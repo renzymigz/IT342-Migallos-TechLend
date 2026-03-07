@@ -12,6 +12,7 @@ import edu.cit.migallos.techlend.dto.AuthResponse;
 import edu.cit.migallos.techlend.dto.LoginRequest;
 import edu.cit.migallos.techlend.dto.RegisterRequest;
 import edu.cit.migallos.techlend.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
@@ -38,5 +39,14 @@ public class AuthController {
                     .body(ApiResponse.error("AUTH-001", "Invalid credentials", null));
         }
         return ResponseEntity.ok(ApiResponse.success(data));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            authService.logout(authHeader.substring(7));
+        }
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 }

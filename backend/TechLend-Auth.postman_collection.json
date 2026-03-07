@@ -144,6 +144,39 @@
 			"response": []
 		},
 		{
+			"name": "Logout",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.response.code === 200) {",
+							"    pm.collectionVariables.set('accessToken', '');",
+							"    pm.collectionVariables.set('refreshToken', '');",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/auth/logout",
+					"host": ["{{baseUrl}}"],
+					"path": ["auth", "logout"]
+				},
+				"description": "Invalidates the current access token server-side. Clears stored tokens on success."
+			},
+			"response": []
+		},
+		{
 			"name": "Get Current User (me)",
 			"request": {
 				"method": "GET",
