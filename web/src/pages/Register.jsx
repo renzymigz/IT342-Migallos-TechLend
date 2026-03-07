@@ -1,24 +1,47 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
+import { useAuth } from "@/context/AuthContext"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { GoogleIcon } from "@/components/google-icon"
-import { Cpu, Eye, EyeOff, UserPlus } from "lucide-react"
+import { Cpu, Eye, EyeOff, UserPlus, Loader2 } from "lucide-react"
 
 export default function Register() {
   const navigate = useNavigate()
+  const { register } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    // Mock register — navigate to login
-    navigate("/login")
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    schoolId: "",
+    contactNumber: "",
+  })
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  const handleGoogleRegister = () => {
-    navigate("/dashboard")
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError("")
+    setIsLoading(true)
+    try {
+      await register(formData)
+      navigate("/login")
+    } catch (err) {
+      const apiError = err.response?.data?.error
+      const msg = apiError?.message || "Registration failed. Please try again."
+      setError(msg)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -40,22 +63,28 @@ export default function Register() {
           </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            {error && (
+              <div className="rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                {error}
+              </div>
+            )}
+
             {/* Name Row */}
             <div className="grid grid-cols-2 gap-3">
               <div className="flex flex-col gap-2">
                 <Label htmlFor="reg-first-name">First Name</Label>
-                <Input id="reg-first-name" placeholder="Juan" />
+                <Input id="reg-first-name" name="firstName" placeholder="Juan" value={formData.firstName} onChange={handleChange} required />
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="reg-last-name">Last Name</Label>
-                <Input id="reg-last-name" placeholder="Dela Cruz" />
+                <Input id="reg-last-name" name="lastName" placeholder="Dela Cruz" value={formData.lastName} onChange={handleChange} required />
               </div>
             </div>
 
             {/* Email */}
             <div className="flex flex-col gap-2">
               <Label htmlFor="reg-email">Email Address</Label>
-              <Input id="reg-email" type="email" placeholder="student@cit.edu" />
+              <Input id="reg-email" name="email" type="email" placeholder="student@cit.edu" value={formData.email} onChange={handleChange} required />
             </div>
 
             {/* Password */}
@@ -64,8 +93,13 @@ export default function Register() {
               <div className="relative">
                 <Input
                   id="reg-password"
+                  name="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Create a strong password"
+                  placeholder="Create a strong password (min 8 chars)"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  minLength={8}
                 />
                 <button
                   type="button"
@@ -84,19 +118,23 @@ export default function Register() {
                 <Label htmlFor="reg-school-id">
                   School ID <span className="text-muted-foreground font-normal">(Optional)</span>
                 </Label>
-                <Input id="reg-school-id" placeholder="e.g., 20-1234-567" />
+                <Input id="reg-school-id" name="schoolId" placeholder="e.g., 20-1234-567" value={formData.schoolId} onChange={handleChange} />
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="reg-contact">
                   Contact No. <span className="text-muted-foreground font-normal">(Optional)</span>
                 </Label>
-                <Input id="reg-contact" placeholder="e.g., 09171234567" />
+                <Input id="reg-contact" name="contactNumber" placeholder="e.g., 09171234567" value={formData.contactNumber} onChange={handleChange} />
               </div>
             </div>
 
-            <Button type="submit" className="w-full mt-1">
-              <UserPlus className="mr-2 h-4 w-4" />
-              Create Account
+            <Button type="submit" className="w-full mt-1" disabled={isLoading}>
+              {isLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <UserPlus className="mr-2 h-4 w-4" />
+              )}
+              {isLoading ? "Creating account..." : "Create Account"}
             </Button>
 
             {/* Divider */}
@@ -107,7 +145,7 @@ export default function Register() {
               </span>
             </div>
 
-            <Button type="button" variant="outline" className="w-full" onClick={handleGoogleRegister}>
+            <Button type="button" variant="outline" className="w-full" disabled>
               <GoogleIcon className="mr-2 h-4 w-4" />
               Continue with Google
             </Button>
