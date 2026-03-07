@@ -1,3 +1,4 @@
+import { useAuth } from "@/context/AuthContext"
 import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -5,18 +6,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { User, Mail, Phone, IdCard } from "lucide-react"
 
-// Mock user data — will be replaced with real API data later
-const mockUser = {
-  firstName: "Juan",
-  lastName: "Dela Cruz",
-  email: "juan.delacruz@cit.edu",
-  schoolId: "20-1234-567",
-  phone: "09171234567",
-  role: "Student",
-}
-
 export default function Profile() {
-  const user = mockUser
+  const { user } = useAuth()
 
   return (
     <div className="pt-16">
@@ -36,7 +27,7 @@ export default function Profile() {
                 <h2 className="text-xl font-bold text-foreground">
                   {user.firstName} {user.lastName}
                 </h2>
-                <p className="text-sm text-muted-foreground">{user.role}</p>
+                <p className="text-sm text-muted-foreground capitalize">{user.role?.toLowerCase()}</p>
               </div>
             </div>
 
@@ -84,7 +75,7 @@ export default function Profile() {
                 </Label>
                 <div className="relative">
                   <IdCard className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input readOnly value={user.schoolId} className="pl-9 bg-muted/50" />
+                    <Input readOnly value={user.schoolId || "—"} className="pl-9 bg-muted/50" />
                 </div>
               </div>
 
@@ -95,7 +86,7 @@ export default function Profile() {
                 </Label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input readOnly value={user.phone} className="pl-9 bg-muted/50" />
+                  <Input readOnly value={user.contactNumber || "—"} className="pl-9 bg-muted/50" />
                 </div>
               </div>
             </div>
