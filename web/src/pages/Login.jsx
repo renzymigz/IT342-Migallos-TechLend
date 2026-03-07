@@ -1,24 +1,36 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
+import { useAuth } from "@/context/AuthContext"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { GoogleIcon } from "@/components/google-icon"
-import { Cpu, Eye, EyeOff, LogIn } from "lucide-react"
+import { Cpu, Eye, EyeOff, LogIn, Loader2 } from "lucide-react"
 
 export default function Login() {
   const navigate = useNavigate()
+  const { login } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
+  const [identifier, setIdentifier] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // Mock login — navigate to dashboard
-    navigate("/dashboard")
-  }
-
-  const handleGoogleLogin = () => {
-    navigate("/dashboard")
+    setError("")
+    setIsLoading(true)
+    try {
+      await login(identifier, password)
+      navigate("/dashboard")
+    } catch (err) {
+      const msg =
+        err.response?.data?.error?.message || "Invalid credentials. Please try again."
+      setError(msg)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -60,12 +72,20 @@ export default function Login() {
           </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            {error && (
+              <div className="rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                {error}
+              </div>
+            )}
+
             <div className="flex flex-col gap-2">
               <Label htmlFor="login-email">Email or School ID</Label>
               <Input
                 id="login-email"
                 placeholder="20-1234-567 or student@cit.edu"
-                defaultValue="juan.delacruz@cit.edu"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                required
               />
             </div>
 
@@ -84,7 +104,9 @@ export default function Login() {
                   id="login-password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
-                  defaultValue="password123"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
                 />
                 <button
                   type="button"
@@ -97,9 +119,13 @@ export default function Login() {
               </div>
             </div>
 
-            <Button type="submit" className="w-full mt-1">
-              <LogIn className="mr-2 h-4 w-4" />
-              Sign In
+            <Button type="submit" className="w-full mt-1" disabled={isLoading}>
+              {isLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <LogIn className="mr-2 h-4 w-4" />
+              )}
+              {isLoading ? "Signing in..." : "Sign In"}
             </Button>
 
             {/* Divider */}
@@ -110,7 +136,7 @@ export default function Login() {
               </span>
             </div>
 
-            <Button type="button" variant="outline" className="w-full" onClick={handleGoogleLogin}>
+            <Button type="button" variant="outline" className="w-full" disabled>
               <GoogleIcon className="mr-2 h-4 w-4" />
               Continue with Google
             </Button>
