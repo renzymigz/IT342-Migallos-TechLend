@@ -1,34 +1,29 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Routes, Route, Navigate, useLocation } from "react-router-dom"
+import "./App.css"
+import { Navbar } from "@/components/navbar"
+import Login from "@/pages/Login"
+import Register from "@/pages/Register"
+import Dashboard from "@/pages/Dashboard"
+import Profile from "@/pages/Profile"
+
+// Pages where Navbar should be hidden (they have their own layout)
+const noNavbarPaths = new Set(["/login", "/register"])
 
 function App() {
-  const [count, setCount] = useState(0)
+  const location = useLocation()
+  const showNavbar = !noNavbarPaths.has(location.pathname)
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1 className = "text-9xl">Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div className="min-h-screen bg-background">
+      {showNavbar && <Navbar />}
+      <Routes>
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/profile" element={<Profile />} />
+      </Routes>
+    </div>
   )
 }
 
