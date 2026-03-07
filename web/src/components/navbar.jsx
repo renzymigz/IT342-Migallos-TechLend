@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "react-router-dom"
+import { useAuth } from "@/context/AuthContext"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
@@ -13,10 +14,16 @@ import { Cpu, User, LogOut } from "lucide-react"
 
 export function Navbar() {
   const navigate = useNavigate()
+  const { user, logout } = useAuth()
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await logout()
     navigate("/login")
   }
+
+  const initials = user
+    ? `${user.firstName?.[0] ?? ""}${user.lastName?.[0] ?? ""}`
+    : ""
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-card">
@@ -35,7 +42,7 @@ export function Navbar() {
             <Button variant="ghost" size="icon" className="rounded-full">
               <Avatar className="h-8 w-8">
                 <AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">
-                  JD
+                  {initials}
                 </AvatarFallback>
               </Avatar>
             </Button>
@@ -43,9 +50,11 @@ export function Navbar() {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col gap-1">
-                <p className="text-sm font-semibold leading-none">Juan Dela Cruz</p>
+                <p className="text-sm font-semibold leading-none">
+                  {user?.firstName} {user?.lastName}
+                </p>
                 <p className="text-xs leading-none text-muted-foreground">
-                  juan.delacruz@cit.edu
+                  {user?.email}
                 </p>
               </div>
             </DropdownMenuLabel>
