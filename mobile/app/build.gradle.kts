@@ -7,6 +7,10 @@ android {
     namespace = "com.example.techlend"
     compileSdk = 34
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId = "com.example.techlend"
         minSdk = 24

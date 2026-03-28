@@ -131,8 +131,8 @@ class RegisterActivity : AppCompatActivity() {
                     val message = ApiErrorParser.getMessage(response, "Unable to create account")
                     showToast(message)
                 }
-            } catch (_: IOException) {
-                showToast("Cannot reach server. Check your network and backend status.")
+            } catch (e: IOException) {
+                showToast(getNetworkHint(e))
             } catch (_: Exception) {
                 showToast("Something went wrong while creating account")
             } finally {
@@ -159,5 +159,20 @@ class RegisterActivity : AppCompatActivity() {
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
 
+    }
+
+    private fun getNetworkHint(error: IOException): String {
+        val msg = error.message.orEmpty()
+        return when {
+            msg.contains("CLEARTEXT", ignoreCase = true) -> {
+                "HTTP blocked by Android cleartext policy."
+            }
+            msg.contains("10.0.2.2") -> {
+                "Cannot reach 10.0.2.2:8080. Start backend; on physical device, use your PC LAN IP instead."
+            }
+            else -> {
+                "Cannot reach server. Ensure backend is running on port 8080."
+            }
+        }
     }
 }
