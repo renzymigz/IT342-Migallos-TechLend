@@ -120,7 +120,7 @@
         android:layout_height="50dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/bg_rounded_edittext"
-        android:drawableEnd="@drawable/ic_eye"
+        android:drawableEnd="@drawable/ic_eye_off"
         android:hint="••••••••••"
         android:inputType="textPassword"
         android:paddingHorizontal="16dp"

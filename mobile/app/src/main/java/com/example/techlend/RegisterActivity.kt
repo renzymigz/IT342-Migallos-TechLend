@@ -2,7 +2,10 @@ package com.example.techlend
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.method.HideReturnsTransformationMethod
+import android.text.method.PasswordTransformationMethod
 import android.util.Patterns
+import android.view.MotionEvent
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
@@ -55,6 +58,8 @@ class RegisterActivity : AppCompatActivity() {
             // Already on register screen.
         }
 
+        setupPasswordToggle(etPassword)
+
         tvToggleSignIn.setOnClickListener {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
@@ -69,12 +74,42 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupPasswordToggle(passwordField: EditText) {
+        var isPasswordVisible = false
+        passwordField.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_eye_off, 0)
+
+        passwordField.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_UP) {
+                val endDrawable = passwordField.compoundDrawablesRelative[2] ?: return@setOnTouchListener false
+                val isTouchOnEndDrawable = event.rawX >=
+                    (passwordField.right - endDrawable.bounds.width() - passwordField.paddingEnd)
+
+                if (isTouchOnEndDrawable) {
+                    isPasswordVisible = !isPasswordVisible
+                    passwordField.transformationMethod = if (isPasswordVisible) {
+                        HideReturnsTransformationMethod.getInstance()
+                    } else {
+                        PasswordTransformationMethod.getInstance()
+                    }
+
+                    val iconRes = if (isPasswordVisible) R.drawable.ic_eye else R.drawable.ic_eye_off
+                    passwordField.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, iconRes, 0)
+                    passwordField.setSelection(passwordField.text?.length ?: 0)
+                    passwordField.performClick()
+                    return@setOnTouchListener true
+                }
+            }
+
+            false
+        }
+    }
+
     private fun registerUser() {
         val firstName = etFirstName.text.toString().trim()
         val lastName = etLastName.text.toString().trim()
         val email = etEmail.text.toString().trim()
         val password = etPassword.text.toString()
-        val schoolId = etSchoolId.text.toString().trim().ifBlank { null }
+        val schoolId = etSchoolId.text.toString().trim()
         val contactNo = etContactNo.text.toString().trim().ifBlank { null }
 
         if (firstName.isBlank()) {
@@ -95,6 +130,11 @@ class RegisterActivity : AppCompatActivity() {
         if (password.length < 8) {
             etPassword.error = "Password must be at least 8 characters"
             etPassword.requestFocus()
+            return
+        }
+        if (schoolId.isBlank()) {
+            etSchoolId.error = "School ID is required"
+            etSchoolId.requestFocus()
             return
         }
 
@@ -126,6 +166,7 @@ class RegisterActivity : AppCompatActivity() {
                         email = authData?.user?.email,
                         fullName = "$firstName $lastName"
                     )
+                    showToast("Registration successful!")
                     openDashboard()
                 } else {
                     val message = ApiErrorParser.getMessage(response, "Unable to create account")

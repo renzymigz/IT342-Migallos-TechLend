@@ -2,6 +2,9 @@ package com.example.techlend
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.method.HideReturnsTransformationMethod
+import android.text.method.PasswordTransformationMethod
+import android.view.MotionEvent
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
@@ -52,6 +55,8 @@ class LoginActivity : AppCompatActivity() {
             // Already on login screen.
         }
 
+        setupPasswordToggle(etPassword)
+
         tvToggleRegister.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
             finish()
@@ -67,6 +72,36 @@ class LoginActivity : AppCompatActivity() {
 
         btnSignIn.setOnClickListener {
             loginUser()
+        }
+    }
+
+    private fun setupPasswordToggle(passwordField: EditText) {
+        var isPasswordVisible = false
+        passwordField.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_eye_off, 0)
+
+        passwordField.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_UP) {
+                val endDrawable = passwordField.compoundDrawablesRelative[2] ?: return@setOnTouchListener false
+                val isTouchOnEndDrawable = event.rawX >=
+                    (passwordField.right - endDrawable.bounds.width() - passwordField.paddingEnd)
+
+                if (isTouchOnEndDrawable) {
+                    isPasswordVisible = !isPasswordVisible
+                    passwordField.transformationMethod = if (isPasswordVisible) {
+                        HideReturnsTransformationMethod.getInstance()
+                    } else {
+                        PasswordTransformationMethod.getInstance()
+                    }
+
+                    val iconRes = if (isPasswordVisible) R.drawable.ic_eye else R.drawable.ic_eye_off
+                    passwordField.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, iconRes, 0)
+                    passwordField.setSelection(passwordField.text?.length ?: 0)
+                    passwordField.performClick()
+                    return@setOnTouchListener true
+                }
+            }
+
+            false
         }
     }
 
@@ -129,6 +164,7 @@ class LoginActivity : AppCompatActivity() {
                         email = authData?.user?.email,
                         fullName = fullName
                     )
+                    showToast("Login successful!")
                     openDashboard()
                 } else {
                     val message = ApiErrorParser.getMessage(response, "Unable to sign in")
