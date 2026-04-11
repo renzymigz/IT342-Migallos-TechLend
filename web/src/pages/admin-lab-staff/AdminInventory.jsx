@@ -4,12 +4,12 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { StatusBadge } from "@/components/status-badge"
 import {
   Barcode,
@@ -227,18 +227,23 @@ export default function AdminInventory() {
                 className="pl-9"
               />
             </div>
-            <Select value={filterCategory} onValueChange={setFilterCategory}>
-              <SelectTrigger className="w-44">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
-                    {cat}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-44 justify-between">
+                  <span className="truncate">{filterCategory}</span>
+                  <ChevronDown className="ml-2 h-4 w-4 text-muted-foreground" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56">
+                <DropdownMenuRadioGroup value={filterCategory} onValueChange={setFilterCategory}>
+                  {categories.map((cat) => (
+                    <DropdownMenuRadioItem key={cat} value={cat}>
+                      {cat}
+                    </DropdownMenuRadioItem>
+                  ))}
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
           <Button onClick={() => setAddModelOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
@@ -424,20 +429,35 @@ export default function AdminInventory() {
 
               <div className="flex flex-col gap-2">
                 <Label htmlFor="model-category" className="text-foreground">Category</Label>
-                <Select value={newModelCategory} onValueChange={setNewModelCategory}>
-                  <SelectTrigger id="model-category">
-                    <SelectValue placeholder="Select a category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories
-                      .filter((c) => c !== "All Categories")
-                      .map((cat) => (
-                        <SelectItem key={cat} value={cat}>
-                          {cat}
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      id="model-category"
+                      type="button"
+                      variant="outline"
+                      className="w-full justify-between"
+                    >
+                      <span className={newModelCategory ? "truncate" : "truncate text-muted-foreground"}>
+                        {newModelCategory || "Select a category"}
+                      </span>
+                      <ChevronDown className="ml-2 h-4 w-4 text-muted-foreground" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width)">
+                    <DropdownMenuRadioGroup
+                      value={newModelCategory}
+                      onValueChange={setNewModelCategory}
+                    >
+                      {categories
+                        .filter((c) => c !== "All Categories")
+                        .map((cat) => (
+                          <DropdownMenuRadioItem key={cat} value={cat}>
+                            {cat}
+                          </DropdownMenuRadioItem>
+                        ))}
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
 
               <div className="flex flex-col gap-2">

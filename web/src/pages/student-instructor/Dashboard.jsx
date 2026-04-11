@@ -1,7 +1,13 @@
 import { useState, useMemo } from "react"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { EquipmentCard } from "@/components/equipment-card"
 import { StatusBadge } from "@/components/status-badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -11,6 +17,7 @@ import {
   Search,
   ShoppingCart,
   Cpu,
+  ChevronDown,
   History,
   Package,
   Clock,
@@ -165,18 +172,23 @@ export default function Dashboard() {
                       className="pl-9"
                     />
                   </div>
-                  <Select value={category} onValueChange={setCategory}>
-                    <SelectTrigger className="w-full sm:w-52">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((cat) => (
-                        <SelectItem key={cat} value={cat}>
-                          {cat}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" className="w-full justify-between sm:w-52">
+                        <span className="truncate">{category}</span>
+                        <ChevronDown className="ml-2 h-4 w-4 text-muted-foreground" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56">
+                      <DropdownMenuRadioGroup value={category} onValueChange={setCategory}>
+                        {categories.map((cat) => (
+                          <DropdownMenuRadioItem key={cat} value={cat}>
+                            {cat}
+                          </DropdownMenuRadioItem>
+                        ))}
+                      </DropdownMenuRadioGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
