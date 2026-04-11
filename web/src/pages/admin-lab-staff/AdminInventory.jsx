@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label"
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
@@ -18,7 +19,9 @@ import {
   ChevronRight,
   Cpu,
   Monitor,
+  MoreHorizontal,
   Plus,
+  RefreshCcw,
   Search,
   ServerCog,
   Thermometer,
@@ -272,7 +275,7 @@ export default function AdminInventory() {
                 return (
                   <Fragment key={model.id}>
                     <tr
-                      className="cursor-pointer transition-colors hover:bg-accent/40"
+                      className="cursor-pointer transition-colors hover:bg-[#eef4fa] border-b border-border"
                       onClick={() => toggleExpand(model.id)}
                     >
                       <td className="w-10 px-3 py-5">
@@ -305,7 +308,7 @@ export default function AdminInventory() {
                     </tr>
 
                     {isExpanded && (
-                      <tr className="bg-muted/20">
+                      <tr className="bg-muted/20 border-t-2 border-border border-b">
                         <td colSpan={6} className="p-0">
                           <div className="px-8 py-5">
                             <div className="flex flex-col gap-4">
@@ -337,6 +340,7 @@ export default function AdminInventory() {
                                     <tr>
                                       <th className="px-3 py-2 text-left">Property Tag</th>
                                       <th className="px-3 py-2 text-left">Status</th>
+                                      <th className="px-3 py-2 text-left">Borrower</th>
                                       <th className="px-3 py-2 text-right">Actions</th>
                                     </tr>
                                   </thead>
@@ -354,17 +358,34 @@ export default function AdminInventory() {
                                             <StatusBadge status={item.status} />
                                           </div>
                                         </td>
+                                        <td className="px-3 py-2 text-muted-foreground">
+                                          {item.borrowerName || "-"}
+                                        </td>
                                         <td className="px-3 py-2 text-right">
-                                          <Button
-                                            size="sm"
-                                            variant="ghost"
-                                            onClick={(e) => {
-                                              e.stopPropagation()
-                                              setStatusChangeTarget({ modelId: model.id, item })
-                                            }}
-                                          >
-                                            Change Status
-                                          </Button>
+                                          <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                              <Button
+                                                size="icon"
+                                                variant="ghost"
+                                                className="h-8 w-8"
+                                                onClick={(e) => e.stopPropagation()}
+                                                aria-label="Open actions"
+                                              >
+                                                <MoreHorizontal className="h-4 w-4" />
+                                              </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end" className="w-44">
+                                              <DropdownMenuItem
+                                                onClick={(e) => {
+                                                  e.stopPropagation()
+                                                  setStatusChangeTarget({ modelId: model.id, item })
+                                                }}
+                                              >
+                                                <RefreshCcw className="mr-2 h-4 w-4" />
+                                                Change Status
+                                              </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                          </DropdownMenu>
                                         </td>
                                       </tr>
                                     ))}
@@ -488,7 +509,7 @@ export default function AdminInventory() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-lg">
             <div className="mb-5">
-              <h2 className="text-lg font-semibold text-foreground">Add Physical Barcode</h2>
+              <h2 className="text-lg font-semibold text-foreground">Add Physical Unit</h2>
               <p className="text-sm text-muted-foreground">
                 Register a new physical unit for{" "}
                 <span className="font-semibold text-foreground">
@@ -511,7 +532,7 @@ export default function AdminInventory() {
                   />
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  This tag must be unique and match the physical barcode sticker.
+                  This tag must be unique.
                 </p>
               </div>
               <div className="rounded-md bg-secondary/70 px-3 py-2">
