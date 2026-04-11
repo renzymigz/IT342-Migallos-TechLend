@@ -88,7 +88,7 @@ export default function Dashboard() {
       {/* Main Content */}
       <main>
         {selectedEquipment ? (
-          /* ─── Equipment Detail View ─── */
+          /* --- Equipment Detail View --- */
           <div className="mx-auto max-w-3xl px-4 py-6">
             <Button
               variant="ghost"
@@ -138,7 +138,7 @@ export default function Dashboard() {
             </Card>
           </div>
         ) : (
-          /* ─── Tabs: Catalog & History ─── */
+          /* --- Tabs: Catalog & History --- */
           <div className="mx-auto max-w-7xl px-4 py-6">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               {/* Mobile tabs */}
@@ -153,7 +153,7 @@ export default function Dashboard() {
                 </TabsTrigger>
               </TabsList>
 
-              {/* ─── Catalog Tab ─── */}
+              {/* --- Catalog Tab --- */}
               <TabsContent value="catalog" className="mt-6">
                 <div className="mb-6 flex flex-col gap-3 sm:flex-row">
                   <div className="relative flex-1">
@@ -202,7 +202,7 @@ export default function Dashboard() {
                 )}
               </TabsContent>
 
-              {/* ─── History Tab ─── */}
+              {/* --- History Tab --- */}
               <TabsContent value="history" className="mt-6">
                 <div className="flex flex-col gap-4">
                   {myTransactions.length === 0 ? (

@@ -75,7 +75,7 @@ export default function Profile() {
                 </Label>
                 <div className="relative">
                   <IdCard className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input readOnly value={user.schoolId || "—"} className="pl-9 bg-muted/50" />
+                  <Input readOnly value={user.schoolId || "—"} className="pl-9 bg-muted/50" />
                 </div>
               </div>
 
