@@ -1,19 +1,40 @@
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
+import { useAuth } from "@/context/AuthContext"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Eye, EyeOff, LogIn, Loader2, Shield } from "lucide-react"
 
 export default function AdminLogin() {
+  const navigate = useNavigate()
+  const { login, logout } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [identifier, setIdentifier] = useState("")
   const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
+    setError("")
     setIsLoading(true)
-    setTimeout(() => setIsLoading(false), 800)
+
+    try {
+      const user = await login(identifier, password)
+      if (user.role !== "ADMIN") {
+        await logout()
+        setError("Only admin-lab-staff accounts can sign in here.")
+        return
+      }
+      navigate("/admin/approval-queue")
+    } catch (err) {
+      const msg =
+        err.response?.data?.error?.message || "Invalid credentials. Please try again."
+      setError(msg)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -30,6 +51,12 @@ export default function AdminLogin() {
         </div>
 
         <form onSubmit={handleSubmit} className="px-8 pb-8 space-y-5">
+          {error && (
+            <div className="rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+              {error}
+            </div>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="admin-email">Email or Staff ID</Label>
             <Input

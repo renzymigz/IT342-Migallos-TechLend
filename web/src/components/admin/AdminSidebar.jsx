@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
-import { NavLink } from "react-router-dom"
+import { NavLink, useNavigate } from "react-router-dom"
+import { useAuth } from "@/context/AuthContext"
 import {
   ClipboardCheck,
   Timer,
@@ -27,6 +28,14 @@ export default function AdminSidebar({
   className = "",
   onNavigate,
 }) {
+  const navigate = useNavigate()
+  const { logout } = useAuth()
+
+  const handleSignOut = async () => {
+    await logout()
+    navigate("/admin/login", { replace: true })
+  }
+
   return (
     <aside
       className={[
@@ -63,7 +72,7 @@ export default function AdminSidebar({
         </div>
       </div>
 
-      <div className="flex h-[calc(100vh)] flex-col justify-between">
+      <div className="flex h-[calc(100vh-85px)] flex-col justify-between">
         <nav className="px-3 py-4 space-y-1">
           {navItems.map((item) => {
             const Icon = item.icon
@@ -90,6 +99,7 @@ export default function AdminSidebar({
         <div className="px-3 pb-4">
           <button
             type="button"
+            onClick={handleSignOut}
             className={[
               "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-white/80 transition-colors hover:bg-white/5",
               isCollapsed ? "justify-center" : "",

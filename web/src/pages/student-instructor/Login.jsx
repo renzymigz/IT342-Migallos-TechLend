@@ -10,7 +10,7 @@ import { Cpu, Eye, EyeOff, LogIn, Loader2 } from "lucide-react"
 
 export default function Login() {
   const navigate = useNavigate()
-  const { login } = useAuth()
+  const { login, logout } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [identifier, setIdentifier] = useState("")
   const [password, setPassword] = useState("")
@@ -22,7 +22,12 @@ export default function Login() {
     setError("")
     setIsLoading(true)
     try {
-      await login(identifier, password)
+      const user = await login(identifier, password)
+      if (user.role === "ADMIN") {
+        await logout()
+        setError("Admin accounts must sign in via the admin login page.")
+        return
+      }
       navigate("/dashboard")
     } catch (err) {
       const msg =

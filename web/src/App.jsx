@@ -1,7 +1,11 @@
 import { Routes, Route, Navigate, useLocation } from "react-router-dom"
 import "./App.css"
 import { AuthProvider } from "@/context/AuthContext"
-import { ProtectedRoute, GuestRoute } from "@/components/route-guards"
+import {
+  AdminProtectedRoute,
+  GuestRoute,
+  StudentProtectedRoute,
+} from "@/components/route-guards"
 import { Navbar } from "@/components/navbar"
 import Login from "@/pages/student-instructor/Login"
 import Register from "@/pages/student-instructor/Register"
@@ -30,13 +34,13 @@ function AppRoutes() {
         <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
         <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
         <Route path="/admin/login" element={<GuestRoute><AdminLogin /></GuestRoute>} />
-        <Route path="/admin/approval-queue" element={<AdminApprovalQueue />} />
-        <Route path="/admin/active-loans" element={<AdminActiveLoans />} />
-        <Route path="/admin/inventory" element={<AdminInventory />} />
-        <Route path="/admin/users" element={<AdminUsers />} />
-        <Route path="/admin/incidents" element={<AdminIncidents />} />
-        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="/admin/approval-queue" element={<AdminProtectedRoute><AdminApprovalQueue /></AdminProtectedRoute>} />
+        <Route path="/admin/active-loans" element={<AdminProtectedRoute><AdminActiveLoans /></AdminProtectedRoute>} />
+        <Route path="/admin/inventory" element={<AdminProtectedRoute><AdminInventory /></AdminProtectedRoute>} />
+        <Route path="/admin/users" element={<AdminProtectedRoute><AdminUsers /></AdminProtectedRoute>} />
+        <Route path="/admin/incidents" element={<AdminProtectedRoute><AdminIncidents /></AdminProtectedRoute>} />
+        <Route path="/dashboard" element={<StudentProtectedRoute><Dashboard /></StudentProtectedRoute>} />
+        <Route path="/profile" element={<StudentProtectedRoute><Profile /></StudentProtectedRoute>} />
       </Routes>
     </div>
   )
