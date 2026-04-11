@@ -2,6 +2,7 @@ import api from "./axios"
 
 export const equipmentAPI = {
   getCatalogModels: () => api.get("/equipment-models"),
+  getCatalogItems: () => api.get("/equipment-models/catalog-items"),
   getCatalogModelById: (modelId) => api.get(`/equipment-models/${modelId}`),
   getAdminModels: () => api.get("/admin/equipment-models"),
   createModel: (data) => api.post("/admin/equipment-models", data),

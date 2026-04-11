@@ -60,15 +60,16 @@ export default function Dashboard() {
   const loadCatalog = useCallback(async () => {
     setLoadingCatalog(true)
     try {
-      const res = await equipmentAPI.getCatalogModels()
-      const mapped = (res.data.data || []).map((model) => ({
-        id: model.modelId,
-        propertyTag: `${model.availableCount ?? 0} available`,
-        name: model.name,
-        category: categoryLabels[model.category] || model.category,
-        status: (model.availableCount ?? 0) > 0 ? "available" : "reserved",
-        description: model.description || "No description provided.",
-        availableCount: model.availableCount ?? 0,
+      const res = await equipmentAPI.getCatalogItems()
+      const mapped = (res.data.data || []).map((item) => ({
+        id: item.id,
+        modelId: item.modelId,
+        image: item.image,
+        propertyTag: item.propertyTag || "No property tag",
+        name: item.name,
+        category: categoryLabels[item.category] || item.category,
+        status: (item.status || "AVAILABLE").toLowerCase(),
+        description: item.description || "No description provided.",
       }))
       setCatalog(mapped)
       setCatalogError("")
@@ -210,7 +211,7 @@ export default function Dashboard() {
                       equipment={equipment}
                       onAddToCart={addToCart}
                       inCart={cart.some((i) => i.id === equipment.id)}
-                      onViewDetail={(selected) => navigate(`/catalog/${selected.id}`)}
+                      onViewDetail={(selected) => navigate(`/catalog/${selected.modelId || selected.id}`)}
                     />
                   ))}
                 </div>

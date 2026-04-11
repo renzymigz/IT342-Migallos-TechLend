@@ -14,6 +14,8 @@ public interface EquipmentItemRepository extends JpaRepository<EquipmentItem, UU
 
     boolean existsByPropertyTag(String propertyTag);
 
+    List<EquipmentItem> findAllByOrderByPropertyTagAsc();
+
     List<EquipmentItem> findByModel_ModelId(UUID modelId);
 
     long countByModel_ModelIdAndStatus(UUID modelId, EquipmentItemStatus status);

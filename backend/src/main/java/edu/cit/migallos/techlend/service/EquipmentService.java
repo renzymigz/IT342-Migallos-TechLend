@@ -3,13 +3,18 @@ package edu.cit.migallos.techlend.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+
 import edu.cit.migallos.techlend.dto.CreateEquipmentModelRequest;
+import edu.cit.migallos.techlend.dto.EquipmentCatalogItemResponse;
 import edu.cit.migallos.techlend.dto.EquipmentItemResponse;
 import edu.cit.migallos.techlend.dto.EquipmentModelResponse;
 import edu.cit.migallos.techlend.dto.RegisterEquipmentItemsRequest;
@@ -25,20 +30,30 @@ import edu.cit.migallos.techlend.repository.EquipmentModelRepository;
 public class EquipmentService {
 
     private static final String EQUIPMENT_MODEL_NOT_FOUND = "Equipment model not found";
+    private static final String IMAGE_UPLOAD_FAILED = "Failed to upload image";
 
     private final EquipmentModelRepository equipmentModelRepository;
     private final EquipmentItemRepository equipmentItemRepository;
+    private final Cloudinary cloudinary;
 
     public EquipmentService(EquipmentModelRepository equipmentModelRepository,
-                            EquipmentItemRepository equipmentItemRepository) {
+                            EquipmentItemRepository equipmentItemRepository,
+                            Cloudinary cloudinary) {
         this.equipmentModelRepository = equipmentModelRepository;
         this.equipmentItemRepository = equipmentItemRepository;
+        this.cloudinary = cloudinary;
     }
 
     public List<EquipmentModelResponse> getCatalogModels() {
         List<EquipmentModel> models = equipmentModelRepository.findAll();
         return models.stream()
                 .map(this::toCatalogResponse)
+                .toList();
+    }
+
+    public List<EquipmentCatalogItemResponse> getCatalogItemsForStudents() {
+        return equipmentItemRepository.findAllByOrderByPropertyTagAsc().stream()
+                .map(this::toCatalogItemResponse)
                 .toList();
     }
 
@@ -111,12 +126,27 @@ public class EquipmentService {
         EquipmentModel model = equipmentModelRepository.findById(modelId)
             .orElseThrow(() -> new NoSuchElementException(EQUIPMENT_MODEL_NOT_FOUND));
 
-        String originalName = file.getOriginalFilename();
-        String safeName = (originalName == null || originalName.isBlank())
-                ? "image"
-                : originalName.replaceAll("[^a-zA-Z0-9._-]", "_");
+        String imageUrl;
+        try {
+            Map<?, ?> uploadResult = cloudinary.uploader().upload(
+                    file.getBytes(),
+                    ObjectUtils.asMap(
+                            "folder", "techlend/equipment-models",
+                            "public_id", modelId.toString() + "-" + System.currentTimeMillis(),
+                            "resource_type", "image",
+                            "overwrite", true
+                    )
+            );
+            imageUrl = (String) uploadResult.get("secure_url");
+        } catch (Exception ex) {
+            String reason = ex.getMessage() == null ? "Unknown error" : ex.getMessage();
+            throw new IllegalArgumentException(IMAGE_UPLOAD_FAILED + ": " + reason);
+        }
 
-        String imageUrl = "/uploads/equipment-models/" + modelId + "/" + safeName;
+        if (imageUrl == null || imageUrl.isBlank()) {
+            throw new IllegalArgumentException(IMAGE_UPLOAD_FAILED);
+        }
+
         model.setImageUrl(imageUrl);
         equipmentModelRepository.save(model);
 
@@ -157,6 +187,19 @@ public class EquipmentService {
         response.setPropertyTag(item.getPropertyTag());
         response.setStatus(item.getStatus().name());
         response.setBorrowerName(null);
+        return response;
+    }
+
+    private EquipmentCatalogItemResponse toCatalogItemResponse(EquipmentItem item) {
+        EquipmentCatalogItemResponse response = new EquipmentCatalogItemResponse();
+        response.setId(item.getEquipmentId());
+        response.setModelId(item.getModel().getModelId());
+        response.setImage(item.getModel().getImageUrl());
+        response.setPropertyTag(item.getPropertyTag());
+        response.setName(item.getModel().getName());
+        response.setCategory(item.getModel().getCategory().name());
+        response.setStatus(item.getStatus().name());
+        response.setDescription(item.getModel().getDescription());
         return response;
     }
 

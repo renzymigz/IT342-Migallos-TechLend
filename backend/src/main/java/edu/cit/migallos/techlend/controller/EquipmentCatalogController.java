@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import edu.cit.migallos.techlend.dto.ApiResponse;
+import edu.cit.migallos.techlend.dto.EquipmentCatalogItemResponse;
 import edu.cit.migallos.techlend.dto.EquipmentModelResponse;
 import edu.cit.migallos.techlend.service.EquipmentService;
 
@@ -26,6 +27,11 @@ public class EquipmentCatalogController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<EquipmentModelResponse>>> listCatalogModels() {
         return ResponseEntity.ok(ApiResponse.success(equipmentService.getCatalogModels()));
+    }
+
+    @GetMapping("/catalog-items")
+    public ResponseEntity<ApiResponse<List<EquipmentCatalogItemResponse>>> listCatalogItems() {
+        return ResponseEntity.ok(ApiResponse.success(equipmentService.getCatalogItemsForStudents()));
     }
 
     @GetMapping("/{modelId}")

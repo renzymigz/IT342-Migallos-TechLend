@@ -23,7 +23,19 @@ export function EquipmentCard({ equipment, onAddToCart, inCart, onViewDetail }) 
         onClick={() => onViewDetail?.(equipment)}
         aria-label={`View details for ${equipment.name}`}
       >
-        <div className="text-muted-foreground/50">
+        {equipment.image ? (
+          <img
+            src={equipment.image}
+            alt={equipment.name}
+            className="h-full w-full object-cover"
+            onError={(e) => {
+              e.currentTarget.style.display = "none"
+              const fallback = e.currentTarget.nextElementSibling
+              if (fallback) fallback.classList.remove("hidden")
+            }}
+          />
+        ) : null}
+        <div className={`text-muted-foreground/50 ${equipment.image ? "hidden" : ""}`}>
           {categoryIcons[equipment.category] || <Cpu className="h-8 w-8" />}
         </div>
       </button>
