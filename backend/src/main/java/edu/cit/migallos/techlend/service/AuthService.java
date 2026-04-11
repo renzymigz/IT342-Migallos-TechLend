@@ -78,8 +78,9 @@ public class AuthService {
     }
 
     private AuthResponse buildAuthResponse(User user) {
-        String accessToken = jwtUtil.generateAccessToken(user.getUserId(), user.getEmail());
-        String refreshToken = jwtUtil.generateRefreshToken(user.getUserId(), user.getEmail());
+        String role = user.getRole().name();
+        String accessToken = jwtUtil.generateAccessToken(user.getUserId(), user.getEmail(), role);
+        String refreshToken = jwtUtil.generateRefreshToken(user.getUserId(), user.getEmail(), role);
 
         UserProfileResponse profile = toProfileResponse(user);
         AuthResponse.TokenPair tokens = new AuthResponse.TokenPair(accessToken, refreshToken);

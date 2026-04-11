@@ -10,6 +10,7 @@ import { Navbar } from "@/components/navbar"
 import Login from "@/pages/student-instructor/Login"
 import Register from "@/pages/student-instructor/Register"
 import Dashboard from "@/pages/student-instructor/Dashboard"
+import EquipmentDetail from "@/pages/student-instructor/EquipmentDetail"
 import Profile from "@/pages/student-instructor/Profile"
 import AdminLogin from "@/pages/admin-lab-staff/AdminLogin"
 import AdminApprovalQueue from "@/pages/admin-lab-staff/AdminApprovalQueue"
@@ -40,6 +41,7 @@ function AppRoutes() {
         <Route path="/admin/users" element={<AdminProtectedRoute><AdminUsers /></AdminProtectedRoute>} />
         <Route path="/admin/incidents" element={<AdminProtectedRoute><AdminIncidents /></AdminProtectedRoute>} />
         <Route path="/dashboard" element={<StudentProtectedRoute><Dashboard /></StudentProtectedRoute>} />
+        <Route path="/catalog/:modelId" element={<StudentProtectedRoute><EquipmentDetail /></StudentProtectedRoute>} />
         <Route path="/profile" element={<StudentProtectedRoute><Profile /></StudentProtectedRoute>} />
       </Routes>
     </div>

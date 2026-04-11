@@ -30,19 +30,20 @@ public class JwtUtil {
         this.refreshExpiration = refreshExpiration;
     }
 
-    public String generateAccessToken(UUID userId, String email) {
-        return buildToken(userId, email, accessExpiration, "access");
+    public String generateAccessToken(UUID userId, String email, String role) {
+        return buildToken(userId, email, role, accessExpiration, "access");
     }
 
-    public String generateRefreshToken(UUID userId, String email) {
-        return buildToken(userId, email, refreshExpiration, "refresh");
+    public String generateRefreshToken(UUID userId, String email, String role) {
+        return buildToken(userId, email, role, refreshExpiration, "refresh");
     }
 
-    private String buildToken(UUID userId, String email, long expiration, String tokenType) {
+    private String buildToken(UUID userId, String email, String role, long expiration, String tokenType) {
         Date now = new Date();
         return Jwts.builder()
                 .subject(userId.toString())
                 .claim("email", email)
+                .claim("role", role)
                 .claim("type", tokenType)
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + expiration))

@@ -1,4 +1,6 @@
-import { useState, useMemo } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { useNavigate } from "react-router-dom"
+import { equipmentAPI } from "@/api/equipment"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import {
@@ -11,8 +13,8 @@ import {
 import { EquipmentCard } from "@/components/equipment-card"
 import { StatusBadge } from "@/components/status-badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { mockEquipment, categories, mockTransactions } from "@/lib/mock-data"
+import { Card, CardContent } from "@/components/ui/card"
+import { mockTransactions } from "@/lib/mock-data"
 import {
   Search,
   ShoppingCart,
@@ -22,24 +24,74 @@ import {
   Package,
   Clock,
   CheckCircle2,
+  Loader2,
 } from "lucide-react"
 
+const categoryOptions = [
+  { value: "ALL", label: "All Categories" },
+  { value: "MICROCONTROLLERS", label: "Microcontrollers" },
+  { value: "COMPUTERS_AND_LAPTOPS", label: "Computers and Laptops" },
+  { value: "PERIPHERALS", label: "Peripherals" },
+  { value: "NETWORKING", label: "Networking" },
+  { value: "SENSORS_AND_MODULES", label: "Sensors and Modules" },
+  { value: "CABLES_AND_ADAPTERS", label: "Cables and Adapters" },
+  { value: "ROBOTICS", label: "Robotics" },
+  { value: "AR_VR", label: "AR/VR" },
+  { value: "AUDIO_VISUAL", label: "Audio Visual" },
+  { value: "TOOLS_AND_TESTING", label: "Tools and Testing" },
+  { value: "STORAGE_DEVICES", label: "Storage Devices" },
+  { value: "OTHERS", label: "Others" },
+]
+
+const categoryLabels = Object.fromEntries(
+  categoryOptions.filter((option) => option.value !== "ALL").map((option) => [option.value, option.label])
+)
+
 export default function Dashboard() {
+  const navigate = useNavigate()
   const [search, setSearch] = useState("")
-  const [category, setCategory] = useState("All Categories")
+  const [category, setCategory] = useState("ALL")
   const [cart, setCart] = useState([])
-  const [selectedEquipment, setSelectedEquipment] = useState(null)
+  const [catalog, setCatalog] = useState([])
+  const [loadingCatalog, setLoadingCatalog] = useState(true)
+  const [catalogError, setCatalogError] = useState("")
   const [activeTab, setActiveTab] = useState("catalog")
 
+  const loadCatalog = useCallback(async () => {
+    setLoadingCatalog(true)
+    try {
+      const res = await equipmentAPI.getCatalogModels()
+      const mapped = (res.data.data || []).map((model) => ({
+        id: model.modelId,
+        propertyTag: `${model.availableCount ?? 0} available`,
+        name: model.name,
+        category: categoryLabels[model.category] || model.category,
+        status: (model.availableCount ?? 0) > 0 ? "available" : "reserved",
+        description: model.description || "No description provided.",
+        availableCount: model.availableCount ?? 0,
+      }))
+      setCatalog(mapped)
+      setCatalogError("")
+    } catch (err) {
+      setCatalogError(err.response?.data?.error?.message || "Failed to load equipment catalog.")
+    } finally {
+      setLoadingCatalog(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    loadCatalog()
+  }, [loadCatalog])
+
   const filtered = useMemo(() => {
-    return mockEquipment.filter((item) => {
+    return catalog.filter((item) => {
       const matchSearch =
         item.name.toLowerCase().includes(search.toLowerCase()) ||
         item.propertyTag.toLowerCase().includes(search.toLowerCase())
-      const matchCategory = category === "All Categories" || item.category === category
+      const matchCategory = category === "ALL" || item.category === (categoryLabels[category] || category)
       return matchSearch && matchCategory
     })
-  }, [search, category])
+  }, [catalog, search, category])
 
   const addToCart = (equipment) => {
     if (!cart.some((i) => i.id === equipment.id)) {
@@ -61,7 +113,6 @@ export default function Dashboard() {
               className="text-sm"
               onClick={() => {
                 setActiveTab("catalog")
-                setSelectedEquipment(null)
               }}
             >
               <Cpu className="mr-1.5 h-3.5 w-3.5" />
@@ -73,7 +124,6 @@ export default function Dashboard() {
               className="text-sm"
               onClick={() => {
                 setActiveTab("history")
-                setSelectedEquipment(null)
               }}
             >
               <History className="mr-1.5 h-3.5 w-3.5" />
@@ -94,58 +144,6 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <main>
-        {selectedEquipment ? (
-          /* --- Equipment Detail View --- */
-          <div className="mx-auto max-w-3xl px-4 py-6">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="mb-4"
-              onClick={() => setSelectedEquipment(null)}
-            >
-              &larr; Back to catalog
-            </Button>
-            <Card>
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="text-xl">{selectedEquipment.name}</CardTitle>
-                    <p className="font-mono text-sm text-muted-foreground mt-1">
-                      {selectedEquipment.propertyTag}
-                    </p>
-                  </div>
-                  <StatusBadge status={selectedEquipment.status} />
-                </div>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-4">
-                <p className="text-sm text-muted-foreground">{selectedEquipment.description}</p>
-                {selectedEquipment.specs && (
-                  <div>
-                    <h4 className="text-sm font-semibold mb-2">Specifications</h4>
-                    <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-                      {selectedEquipment.specs.map((spec) => (
-                        <li key={spec}>{spec}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                <Button
-                  className="w-full sm:w-auto"
-                  disabled={selectedEquipment.status !== "available" || cart.some((i) => i.id === selectedEquipment.id)}
-                  onClick={() => addToCart(selectedEquipment)}
-                >
-                  <ShoppingCart className="mr-2 h-4 w-4" />
-                  {(() => {
-                    if (cart.some((i) => i.id === selectedEquipment.id)) return "In Cart"
-                    if (selectedEquipment.status === "available") return "Add to Cart"
-                    return "Unavailable"
-                  })()}
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        ) : (
-          /* --- Tabs: Catalog & History --- */
           <div className="mx-auto max-w-7xl px-4 py-6">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               {/* Mobile tabs */}
@@ -181,9 +179,9 @@ export default function Dashboard() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56">
                       <DropdownMenuRadioGroup value={category} onValueChange={setCategory}>
-                        {categories.map((cat) => (
-                          <DropdownMenuRadioItem key={cat} value={cat}>
-                            {cat}
+                        {categoryOptions.map((cat) => (
+                          <DropdownMenuRadioItem key={cat.value} value={cat.value}>
+                            {cat.label}
                           </DropdownMenuRadioItem>
                         ))}
                       </DropdownMenuRadioGroup>
@@ -191,6 +189,20 @@ export default function Dashboard() {
                   </DropdownMenu>
                 </div>
 
+                {catalogError && (
+                  <Card className="mb-4 border-destructive/40">
+                    <CardContent className="p-3 text-sm text-destructive">{catalogError}</CardContent>
+                  </Card>
+                )}
+
+                {loadingCatalog && (
+                  <div className="flex items-center justify-center py-10 text-sm text-muted-foreground">
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Loading catalog...
+                  </div>
+                )}
+
+                {!loadingCatalog && (
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {filtered.map((equipment) => (
                     <EquipmentCard
@@ -198,12 +210,13 @@ export default function Dashboard() {
                       equipment={equipment}
                       onAddToCart={addToCart}
                       inCart={cart.some((i) => i.id === equipment.id)}
-                      onViewDetail={setSelectedEquipment}
+                      onViewDetail={(selected) => navigate(`/catalog/${selected.id}`)}
                     />
                   ))}
                 </div>
+                )}
 
-                {filtered.length === 0 && (
+                {!loadingCatalog && filtered.length === 0 && (
                   <div className="flex flex-col items-center justify-center py-16 text-center">
                     <Search className="mb-3 h-10 w-10 text-muted-foreground/40" />
                     <p className="text-sm font-medium text-foreground">No equipment found</p>
@@ -267,7 +280,6 @@ export default function Dashboard() {
               </TabsContent>
             </Tabs>
           </div>
-        )}
       </main>
     </div>
   )
