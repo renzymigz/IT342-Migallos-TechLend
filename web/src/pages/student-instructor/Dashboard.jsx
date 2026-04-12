@@ -211,7 +211,7 @@ export default function Dashboard() {
                       equipment={equipment}
                       onAddToCart={addToCart}
                       inCart={cart.some((i) => i.id === equipment.id)}
-                      onViewDetail={(selected) => navigate(`/catalog/${selected.modelId || selected.id}`)}
+                      onViewDetail={(selected) => navigate(`/catalog/item/${selected.id}`)}
                     />
                   ))}
                 </div>

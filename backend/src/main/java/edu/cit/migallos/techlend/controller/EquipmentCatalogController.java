@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import edu.cit.migallos.techlend.dto.ApiResponse;
 import edu.cit.migallos.techlend.dto.EquipmentCatalogItemResponse;
+import edu.cit.migallos.techlend.dto.EquipmentDetailViewResponse;
 import edu.cit.migallos.techlend.dto.EquipmentModelResponse;
 import edu.cit.migallos.techlend.service.EquipmentService;
 
@@ -37,5 +38,10 @@ public class EquipmentCatalogController {
     @GetMapping("/{modelId}")
     public ResponseEntity<ApiResponse<EquipmentModelResponse>> getCatalogModel(@PathVariable UUID modelId) {
         return ResponseEntity.ok(ApiResponse.success(equipmentService.getCatalogModelById(modelId)));
+    }
+
+    @GetMapping("/catalog-items/{equipmentId}")
+    public ResponseEntity<ApiResponse<EquipmentDetailViewResponse>> getCatalogItemDetail(@PathVariable UUID equipmentId) {
+        return ResponseEntity.ok(ApiResponse.success(equipmentService.getCatalogItemDetail(equipmentId)));
     }
 }

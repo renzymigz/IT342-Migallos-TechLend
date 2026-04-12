@@ -41,7 +41,7 @@ function AppRoutes() {
         <Route path="/admin/users" element={<AdminProtectedRoute><AdminUsers /></AdminProtectedRoute>} />
         <Route path="/admin/incidents" element={<AdminProtectedRoute><AdminIncidents /></AdminProtectedRoute>} />
         <Route path="/dashboard" element={<StudentProtectedRoute><Dashboard /></StudentProtectedRoute>} />
-        <Route path="/catalog/:modelId" element={<StudentProtectedRoute><EquipmentDetail /></StudentProtectedRoute>} />
+        <Route path="/catalog/item/:equipmentId" element={<StudentProtectedRoute><EquipmentDetail /></StudentProtectedRoute>} />
         <Route path="/profile" element={<StudentProtectedRoute><Profile /></StudentProtectedRoute>} />
       </Routes>
     </div>

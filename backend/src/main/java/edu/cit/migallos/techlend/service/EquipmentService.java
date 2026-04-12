@@ -15,6 +15,7 @@ import com.cloudinary.utils.ObjectUtils;
 
 import edu.cit.migallos.techlend.dto.CreateEquipmentModelRequest;
 import edu.cit.migallos.techlend.dto.EquipmentCatalogItemResponse;
+import edu.cit.migallos.techlend.dto.EquipmentDetailViewResponse;
 import edu.cit.migallos.techlend.dto.EquipmentItemResponse;
 import edu.cit.migallos.techlend.dto.EquipmentModelResponse;
 import edu.cit.migallos.techlend.dto.RegisterEquipmentItemsRequest;
@@ -61,6 +62,12 @@ public class EquipmentService {
         EquipmentModel model = equipmentModelRepository.findById(modelId)
                 .orElseThrow(() -> new NoSuchElementException(EQUIPMENT_MODEL_NOT_FOUND));
         return toCatalogResponse(model);
+    }
+
+    public EquipmentDetailViewResponse getCatalogItemDetail(UUID equipmentId) {
+        EquipmentItem item = equipmentItemRepository.findById(equipmentId)
+                .orElseThrow(() -> new NoSuchElementException("Equipment item not found"));
+        return toDetailViewResponse(item);
     }
 
     public List<EquipmentModelResponse> getAdminModels() {
@@ -195,6 +202,19 @@ public class EquipmentService {
         response.setId(item.getEquipmentId());
         response.setModelId(item.getModel().getModelId());
         response.setImage(item.getModel().getImageUrl());
+        response.setPropertyTag(item.getPropertyTag());
+        response.setName(item.getModel().getName());
+        response.setCategory(item.getModel().getCategory().name());
+        response.setStatus(item.getStatus().name());
+        response.setDescription(item.getModel().getDescription());
+        return response;
+    }
+
+    private EquipmentDetailViewResponse toDetailViewResponse(EquipmentItem item) {
+        EquipmentDetailViewResponse response = new EquipmentDetailViewResponse();
+        response.setEquipmentId(item.getEquipmentId());
+        response.setModelId(item.getModel().getModelId());
+        response.setImageUrl(item.getModel().getImageUrl());
         response.setPropertyTag(item.getPropertyTag());
         response.setName(item.getModel().getName());
         response.setCategory(item.getModel().getCategory().name());
