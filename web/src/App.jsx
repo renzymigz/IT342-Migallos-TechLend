@@ -1,15 +1,18 @@
 import { Routes, Route, Navigate, useLocation } from "react-router-dom"
 import "./App.css"
 import { AuthProvider } from "@/context/AuthContext"
+import { CartProvider } from "@/context/CartContext"
 import {
   AdminProtectedRoute,
   GuestRoute,
   StudentProtectedRoute,
 } from "@/components/route-guards"
 import { Navbar } from "@/components/navbar"
+import { CartSheet } from "@/components/cart-sheet"
 import Login from "@/pages/student-instructor/Login"
 import Register from "@/pages/student-instructor/Register"
 import Dashboard from "@/pages/student-instructor/Dashboard"
+import MyLoans from "@/pages/student-instructor/MyLoans"
 import EquipmentDetail from "@/pages/student-instructor/EquipmentDetail"
 import Profile from "@/pages/student-instructor/Profile"
 import AdminLogin from "@/pages/admin-lab-staff/AdminLogin"
@@ -30,6 +33,7 @@ function AppRoutes() {
   return (
     <div className="min-h-screen bg-background">
       {showNavbar && <Navbar />}
+      {showNavbar && <CartSheet />}
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
@@ -41,6 +45,7 @@ function AppRoutes() {
         <Route path="/admin/users" element={<AdminProtectedRoute><AdminUsers /></AdminProtectedRoute>} />
         <Route path="/admin/incidents" element={<AdminProtectedRoute><AdminIncidents /></AdminProtectedRoute>} />
         <Route path="/dashboard" element={<StudentProtectedRoute><Dashboard /></StudentProtectedRoute>} />
+        <Route path="/my-loans" element={<StudentProtectedRoute><MyLoans /></StudentProtectedRoute>} />
         <Route path="/catalog/item/:equipmentId" element={<StudentProtectedRoute><EquipmentDetail /></StudentProtectedRoute>} />
         <Route path="/profile" element={<StudentProtectedRoute><Profile /></StudentProtectedRoute>} />
       </Routes>
@@ -51,7 +56,9 @@ function AppRoutes() {
 function App() {
   return (
     <AuthProvider>
-      <AppRoutes />
+      <CartProvider>
+        <AppRoutes />
+      </CartProvider>
     </AuthProvider>
   )
 }
