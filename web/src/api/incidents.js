@@ -3,7 +3,7 @@ import axios from "./axios"
 export const incidentsAPI = {
   // Fetch incidents (replace endpoint if backend available)
   async getAll() {
-    const res = await axios.get("/api/v1/incidents").catch(() => null)
+    const res = await axios.get("/incidents").catch(() => null)
     const payload = res?.data?.data || []
     // map backend PenaltyResponse to frontend incident shape
     return payload.map((p) => ({
@@ -21,13 +21,13 @@ export const incidentsAPI = {
   },
 
   async resolveIncident(incidentId) {
-    const res = await axios.post(`/api/v1/incidents/${incidentId}/resolve`).catch(() => null)
+    const res = await axios.post(`/incidents/${incidentId}/resolve`).catch(() => null)
     return res?.data?.data || null
   },
 
   // Unsuspend a user by id (if backend endpoint exists)
   async unsuspendUser(userId) {
-    const res = await axios.post(`/api/v1/users/${userId}/unsuspend`).catch(() => null)
+    const res = await axios.post(`/users/${userId}/unsuspend`).catch(() => null)
     return res?.data?.data || null
   },
 }
