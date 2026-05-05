@@ -42,11 +42,22 @@ public class PenaltyService {
 
     @Transactional(readOnly = true)
     public List<PenaltyResponse> getAllIncidents() {
-        // Return all users with SUSPENDED status as incidents
-        return userRepository.findAll().stream()
-            .filter(u -> u.getStatus() == UserStatus.SUSPENDED)
-            .map(this::userToIncidentResponse)
+        // Get all penalties
+        List<PenaltyResponse> incidents = new java.util.ArrayList<>(penaltyRepository.findAll().stream().map(this::toResponse).toList());
+        
+        // Track user IDs that already have penalties
+        java.util.Set<UUID> usersWithPenalties = penaltyRepository.findAll().stream()
+            .map(p -> p.getUser().getUserId())
+            .collect(java.util.stream.Collectors.toSet());
+        
+        // Add suspended users (those with SUSPENDED status but no penalty)
+        List<User> suspendedUsers = userRepository.findAll().stream()
+            .filter(u -> u.getStatus() == UserStatus.SUSPENDED && !usersWithPenalties.contains(u.getUserId()))
             .toList();
+        
+        suspendedUsers.forEach(user -> incidents.add(userToIncidentResponse(user)));
+        
+        return incidents;
     }
 
     private PenaltyResponse userToIncidentResponse(User user) {

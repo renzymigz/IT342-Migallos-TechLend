@@ -26,6 +26,7 @@ import edu.cit.migallos.techlend.enums.EquipmentItemStatus;
 import edu.cit.migallos.techlend.enums.LoanItemStatus;
 import edu.cit.migallos.techlend.enums.LoanTransactionStatus;
 import edu.cit.migallos.techlend.enums.PenaltyType;
+import edu.cit.migallos.techlend.enums.UserStatus;
 import edu.cit.migallos.techlend.repository.EquipmentItemRepository;
 import edu.cit.migallos.techlend.repository.LoanDetailRepository;
 import edu.cit.migallos.techlend.repository.LoanTransactionRepository;
@@ -267,6 +268,16 @@ public class LoanService {
                 penaltyService.createPenalty(req);
             } catch (Exception ex) {
                 // intentionally ignore to avoid blocking return processing
+            }
+            // Auto-suspend the user
+            User borrower = userRepository.findById(detail.getTransaction().getBorrowerId()).orElse(null);
+            if (borrower != null) {
+                String reason = returnedStatus == LoanItemStatus.DAMAGED 
+                    ? "Returned damaged equipment: " + detail.getEquipment().getModel().getName()
+                    : "Returned lost equipment: " + detail.getEquipment().getModel().getName();
+                borrower.setStatus(UserStatus.SUSPENDED);
+                borrower.setSuspensionReason(reason);
+                userRepository.save(borrower);
             }
         }
     }
