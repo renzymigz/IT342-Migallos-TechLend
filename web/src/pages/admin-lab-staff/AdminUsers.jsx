@@ -152,8 +152,8 @@ function AdminUsers() {
             </div>
           </div>
           <div className="flex items-center gap-3 rounded-lg border border-border bg-card p-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-success/15">
-              <CheckCircle2 className="h-5 w-5 text-success" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/15">
+              <CheckCircle2 className="h-5 w-5 text-emerald-600" />
             </div>
             <div>
               <p className="text-2xl font-bold text-foreground">{activeCount}</p>
@@ -246,11 +246,7 @@ function AdminUsers() {
                       <StatusBadge status={user.role?.toLowerCase()} />
                     </TableCell>
                     <TableCell>
-                      <StatusBadge
-                        status={
-                          user.status === "ACTIVE" ? "active_account" : "suspended"
-                        }
-                      />
+                      <StatusBadge status={user.status === "ACTIVE" ? "active" : "suspended"} />
                     </TableCell>
                     <TableCell>
                       <DropdownMenu>
