@@ -9,9 +9,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
 import { StatusBadge } from "@/components/status-badge"
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
   AlertTriangle,
   ArrowRightLeft,
   CalendarClock,
+  ChevronDown,
   Clock,
   History,
   Loader2,
@@ -30,6 +37,19 @@ function formatDateTime(value) {
     hour: "numeric",
     minute: "2-digit",
   })
+}
+
+function getStatusCircleColor(status) {
+  const statusMap = {
+    returned: "bg-emerald-500",
+    damaged: "bg-orange-500",
+    lost: "bg-red-500",
+  }
+  return statusMap[status?.toLowerCase()] || "bg-slate-400"
+}
+
+function getStatusLabel(status) {
+  return status.charAt(0).toUpperCase() + status.slice(1)
 }
 
 function EmptyState({ label }) {
@@ -185,20 +205,53 @@ function ReturnCard({ transaction, processing, onProcessReturns }) {
                   </button>
 
                   {isChecked && (
-                    <select
-                      value={conditions[item.equipmentId] || "returned"}
-                      onChange={(e) =>
-                        setConditions((prev) => ({
-                          ...prev,
-                          [item.equipmentId]: e.target.value,
-                        }))
-                      }
-                      className="h-8 w-28 rounded-md border border-input bg-background px-2 text-xs"
-                    >
-                      <option value="returned">Returned</option>
-                      <option value="damaged">Damaged</option>
-                      <option value="lost">Lost</option>
-                    </select>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="inline-flex items-center gap-2 rounded-md border border-input bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
+                          <span className={`h-2 w-2 rounded-full ${getStatusCircleColor(conditions[item.equipmentId] || "returned")}`} />
+                          {getStatusLabel(conditions[item.equipmentId] || "returned")}
+                          <ChevronDown className="h-3 w-3 opacity-50" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuItem
+                          onClick={() =>
+                            setConditions((prev) => ({
+                              ...prev,
+                              [item.equipmentId]: "returned",
+                            }))
+                          }
+                          className="gap-2"
+                        >
+                          <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
+                          <span className="flex-1">Returned</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() =>
+                            setConditions((prev) => ({
+                              ...prev,
+                              [item.equipmentId]: "damaged",
+                            }))
+                          }
+                          className="gap-2"
+                        >
+                          <span className="inline-block h-2 w-2 rounded-full bg-orange-500" />
+                          <span className="flex-1">Damaged</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() =>
+                            setConditions((prev) => ({
+                              ...prev,
+                              [item.equipmentId]: "lost",
+                            }))
+                          }
+                          className="gap-2"
+                        >
+                          <span className="inline-block h-2 w-2 rounded-full bg-red-500" />
+                          <span className="flex-1">Lost</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   )}
                 </div>
 
