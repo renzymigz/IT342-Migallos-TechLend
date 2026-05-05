@@ -8,10 +8,14 @@ public class LoanTransactionResponse {
 
     private UUID transactionId;
     private UUID borrowerId;
+    private String borrowerName;
+    private String borrowerRole;
     private String status;
     private String borrowerNote;
     private String staffRemark;
     private LocalDateTime requestedTime;
+    private LocalDateTime approvedTime;
+    private LocalDateTime checkoutTime;
     private LocalDateTime expectedReturnTime;
     private List<LoanDetailResponse> items;
 
@@ -29,6 +33,22 @@ public class LoanTransactionResponse {
 
     public void setBorrowerId(UUID borrowerId) {
         this.borrowerId = borrowerId;
+    }
+
+    public String getBorrowerName() {
+        return borrowerName;
+    }
+
+    public void setBorrowerName(String borrowerName) {
+        this.borrowerName = borrowerName;
+    }
+
+    public String getBorrowerRole() {
+        return borrowerRole;
+    }
+
+    public void setBorrowerRole(String borrowerRole) {
+        this.borrowerRole = borrowerRole;
     }
 
     public String getStatus() {
@@ -61,6 +81,22 @@ public class LoanTransactionResponse {
 
     public void setRequestedTime(LocalDateTime requestedTime) {
         this.requestedTime = requestedTime;
+    }
+
+    public LocalDateTime getApprovedTime() {
+        return approvedTime;
+    }
+
+    public void setApprovedTime(LocalDateTime approvedTime) {
+        this.approvedTime = approvedTime;
+    }
+
+    public LocalDateTime getCheckoutTime() {
+        return checkoutTime;
+    }
+
+    public void setCheckoutTime(LocalDateTime checkoutTime) {
+        this.checkoutTime = checkoutTime;
     }
 
     public LocalDateTime getExpectedReturnTime() {

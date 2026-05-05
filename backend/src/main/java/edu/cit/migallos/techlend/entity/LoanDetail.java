@@ -40,8 +40,8 @@ public class LoanDetail {
     @Column(name = "item_status", nullable = false)
     private LoanItemStatus itemStatus;
 
-    @Column(name = "remarks")
-    private String remarks;
+    @Column(name = "staff_remarks")
+    private String staffRemarks;
 
     public UUID getDetailId() {
         return detailId;
@@ -83,11 +83,11 @@ public class LoanDetail {
         this.itemStatus = itemStatus;
     }
 
-    public String getRemarks() {
-        return remarks;
+    public String getStaffRemarks() {
+        return staffRemarks;
     }
 
-    public void setRemarks(String remarks) {
-        this.remarks = remarks;
+    public void setStaffRemarks(String staffRemarks) {
+        this.staffRemarks = staffRemarks;
     }
 }

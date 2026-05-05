@@ -11,7 +11,7 @@ public class LoanDetailResponse {
     private String propertyTag;
     private String itemStatus;
     private LocalDateTime actualReturnTime;
-    private String itemRemarks;
+    private String staffRemarks;
 
     public UUID getDetailId() {
         return detailId;
@@ -61,11 +61,11 @@ public class LoanDetailResponse {
         this.actualReturnTime = actualReturnTime;
     }
 
-    public String getItemRemarks() {
-        return itemRemarks;
+    public String getStaffRemarks() {
+        return staffRemarks;
     }
 
-    public void setItemRemarks(String itemRemarks) {
-        this.itemRemarks = itemRemarks;
+    public void setStaffRemarks(String staffRemarks) {
+        this.staffRemarks = staffRemarks;
     }
 }
