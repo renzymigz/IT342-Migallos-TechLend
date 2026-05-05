@@ -39,7 +39,7 @@ export default function AdminSidebar({
   return (
     <aside
       className={[
-        "relative shrink-0 bg-[#091b31] text-white transition-all duration-300",
+        "relative z-10 flex h-full shrink-0 flex-col bg-[#091b31] text-white transition-all duration-300",
         isCollapsed ? "w-20" : "w-72",
         className,
       ].join(" ")}
@@ -72,8 +72,8 @@ export default function AdminSidebar({
         </div>
       </div>
 
-      <div className="flex h-[calc(100vh-85px)] flex-col justify-between">
-        <nav className="px-3 py-4 space-y-1">
+      <div className="flex flex-1 flex-col justify-between overflow-y-auto">
+        <nav className="space-y-1 px-3 py-4">
           {navItems.map((item) => {
             const Icon = item.icon
             return (

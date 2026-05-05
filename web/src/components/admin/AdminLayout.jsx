@@ -14,12 +14,15 @@ export default function AdminLayout({ children }) {
   }, [location.pathname])
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-background flex z-100">
       <div className="hidden lg:block">
-        <AdminSidebar
-          isCollapsed={isCollapsed}
-          onToggle={() => setIsCollapsed((prev) => !prev)}
-        />
+        <div className={isCollapsed ? "w-20" : "w-72"}>
+          <AdminSidebar
+            isCollapsed={isCollapsed}
+            onToggle={() => setIsCollapsed((prev) => !prev)}
+            className="lg:fixed lg:inset-y-0 lg:left-0"
+          />
+        </div>
       </div>
 
       {sidebarOpen && (
@@ -51,7 +54,7 @@ export default function AdminLayout({ children }) {
       )}
 
       <div className="flex flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border bg-card px-4 lg:px-6">
+        <header className="sticky top-0  flex h-16 items-center gap-3 border-b border-border bg-card px-4 lg:px-6">
           <button
             type="button"
             onClick={() => setSidebarOpen(true)}
