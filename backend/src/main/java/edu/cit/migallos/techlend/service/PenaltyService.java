@@ -42,34 +42,25 @@ public class PenaltyService {
 
     @Transactional(readOnly = true)
     public List<PenaltyResponse> getAllIncidents() {
-        // Get all penalties
-        List<PenaltyResponse> incidents = new java.util.ArrayList<>(penaltyRepository.findAll().stream().map(this::toResponse).toList());
-        
-        // Track user IDs that already have penalties
-        java.util.Set<UUID> usersWithPenalties = penaltyRepository.findAll().stream()
-            .map(p -> p.getUser().getUserId())
-            .collect(java.util.stream.Collectors.toSet());
-        
-        // Add manually suspended users (those with SUSPENDED status but no penalty)
-        List<User> suspendedUsers = userRepository.findAll().stream()
-            .filter(u -> u.getStatus() == UserStatus.SUSPENDED && !usersWithPenalties.contains(u.getUserId()))
+        // Return all users with SUSPENDED status as incidents
+        return userRepository.findAll().stream()
+            .filter(u -> u.getStatus() == UserStatus.SUSPENDED)
+            .map(this::userToIncidentResponse)
             .toList();
-        
-        suspendedUsers.forEach(user -> {
-            PenaltyResponse r = new PenaltyResponse();
-            r.setPenaltyId(UUID.randomUUID()); // synthetic ID for manual suspension
-            r.setUserId(user.getUserId());
-            r.setUserName(user.getFirstName() + " " + user.getLastName());
-            r.setUserEmail(user.getEmail());
-            r.setPenaltyType("MANUAL_SUSPENSION");
-            r.setStatus("PENDING");
-            r.setRemarks(null);
-            r.setCreatedAt(LocalDateTime.now());
-            r.setSuspensionReason(user.getSuspensionReason());
-            incidents.add(r);
-        });
-        
-        return incidents;
+    }
+
+    private PenaltyResponse userToIncidentResponse(User user) {
+        PenaltyResponse r = new PenaltyResponse();
+        r.setPenaltyId(UUID.randomUUID());
+        r.setUserId(user.getUserId());
+        r.setUserName(user.getFirstName() + " " + user.getLastName());
+        r.setUserEmail(user.getEmail());
+        r.setPenaltyType("MANUAL_SUSPENSION");
+        r.setStatus("PENDING");
+        r.setRemarks(null);
+        r.setCreatedAt(LocalDateTime.now());
+        r.setSuspensionReason(user.getSuspensionReason());
+        return r;
     }
 
     @Transactional
