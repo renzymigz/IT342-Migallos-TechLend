@@ -53,6 +53,9 @@ public class User {
     @Column(name = "status", nullable = false)
     private UserStatus status;
 
+    @Column(name = "suspension_reason", nullable = true)
+    private String suspensionReason;
+
     public User() {}
 
     public UUID getUserId() {
@@ -133,5 +136,13 @@ public class User {
 
     public void setStatus(UserStatus status) {
         this.status = status;
+    }
+
+    public String getSuspensionReason() {
+        return suspensionReason;
+    }
+
+    public void setSuspensionReason(String suspensionReason) {
+        this.suspensionReason = suspensionReason;
     }
 }
