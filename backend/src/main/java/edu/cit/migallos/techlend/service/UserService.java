@@ -10,7 +10,6 @@ import edu.cit.migallos.techlend.dto.SuspendUserRequest;
 import edu.cit.migallos.techlend.dto.UpdateUserRoleRequest;
 import edu.cit.migallos.techlend.dto.UserResponse;
 import edu.cit.migallos.techlend.entity.User;
-import edu.cit.migallos.techlend.enums.Role;
 import edu.cit.migallos.techlend.enums.UserStatus;
 import edu.cit.migallos.techlend.repository.UserRepository;
 
