@@ -53,6 +53,7 @@ export default function MyLoans() {
         id: transaction.transactionId,
         status: (transaction.status || "PENDING").toLowerCase(),
         date: formatDateOnly(transaction.requestedTime),
+        approvedTime: formatDateTime(transaction.approvedTime),
         dueDate: formatDateOnly(transaction.expectedReturnTime),
         borrowerNote: transaction.borrowerNote || "",
         staffRemarks: transaction.staffRemark || "",
@@ -64,12 +65,8 @@ export default function MyLoans() {
             propertyTag: item.propertyTag || "--",
             itemStatus,
             actualReturnTime: formatDateTime(item.actualReturnTime),
-            itemRemarks: item.itemRemarks || "",
+            itemRemarks: item.staffRemarks || "",
             returned: itemStatus === "returned",
-            condition:
-              itemStatus === "damaged" || itemStatus === "lost" || itemStatus === "returned"
-                ? itemStatus
-                : null,
           }
         }),
       })),

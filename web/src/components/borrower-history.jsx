@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { StatusBadge } from "@/components/status-badge"
@@ -11,6 +12,22 @@ import {
   CalendarClock,
   CircleDot,
 } from "lucide-react"
+
+function getItemDotClass(item) {
+  if (!item.returned) {
+    return "text-primary"
+  }
+
+  if (item.itemStatus === "damaged") {
+    return "text-amber-600"
+  }
+
+  if (item.itemStatus === "lost") {
+    return "text-destructive"
+  }
+
+  return "text-emerald-600"
+}
 
 export function BorrowerHistory({ transactions }) {
   const [expandedId, setExpandedId] = useState(null)
@@ -46,7 +63,10 @@ export function BorrowerHistory({ transactions }) {
                 <span className="font-mono text-sm font-semibold text-foreground">{txn.id}</span>
                 <span className="text-xs text-muted-foreground">{txn.date}</span>
                 <span className="text-xs text-muted-foreground">
-                  {totalCount} item{totalCount !== 1 ? "s" : ""}
+                  Approved: {txn.approvedTime || "--"}
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  {totalCount} item{totalCount === 1 ? "" : "s"}
                   {txn.status === "active" || txn.status === "completed"
                     ? ` · ${returnedCount}/${totalCount} returned`
                     : ""}
@@ -70,18 +90,17 @@ export function BorrowerHistory({ transactions }) {
                     Loan Items
                   </div>
 
-                  <div className="hidden rounded-t-md border border-b-0 border-border bg-muted/60 px-3 py-2 sm:grid sm:grid-cols-[1fr_auto_auto_auto] sm:items-center sm:gap-3">
+                  <div className="hidden rounded-t-md border border-b-0 border-border bg-muted/60 px-3 py-2 sm:grid sm:grid-cols-[1fr_auto_auto] sm:items-center sm:gap-3">
                     <span className="text-xs font-medium text-muted-foreground">Equipment</span>
                     <span className="w-20 text-center text-xs font-medium text-muted-foreground">Status</span>
                     <span className="w-28 text-center text-xs font-medium text-muted-foreground">Returned On</span>
-                    <span className="w-20 text-center text-xs font-medium text-muted-foreground">Condition</span>
                   </div>
 
                   <div className="flex flex-col">
                     {txn.items.map((item, idx) => (
                       <div
                         key={item.equipmentId}
-                        className={`flex flex-col gap-2 border border-border bg-card px-3 py-2.5 sm:grid sm:grid-cols-[1fr_auto_auto_auto] sm:items-center sm:gap-3 ${
+                        className={`flex flex-col gap-2 border border-border bg-card px-3 py-2.5 sm:grid sm:grid-cols-[1fr_auto_auto] sm:items-center sm:gap-3 ${
                           idx < txn.items.length - 1 ? "border-b-0" : ""
                         } ${idx === 0 ? "rounded-t-md sm:rounded-t-none" : ""} ${
                           idx === txn.items.length - 1 ? "rounded-b-md" : ""
@@ -89,15 +108,7 @@ export function BorrowerHistory({ transactions }) {
                       >
                         <div className="flex items-center gap-2">
                           <CircleDot
-                            className={`h-3 w-3 shrink-0 ${
-                              item.returned
-                                ? item.condition === "damaged"
-                                  ? "text-amber-600"
-                                  : item.condition === "lost"
-                                    ? "text-destructive"
-                                    : "text-emerald-600"
-                                : "text-primary"
-                            }`}
+                            className={`h-3 w-3 shrink-0 ${getItemDotClass(item)}`}
                           />
                           <div>
                             <span className="text-sm font-medium text-foreground">{item.equipmentName}</span>
@@ -116,14 +127,6 @@ export function BorrowerHistory({ transactions }) {
                                 <CalendarClock className="h-3 w-3" />
                                 {item.actualReturnTime}
                               </span>
-                            ) : (
-                              <span className="text-xs text-muted-foreground/50">--</span>
-                            )}
-                          </div>
-
-                          <div className="sm:flex sm:w-20 sm:justify-center">
-                            {item.condition ? (
-                              <StatusBadge status={item.condition} />
                             ) : (
                               <span className="text-xs text-muted-foreground/50">--</span>
                             )}
