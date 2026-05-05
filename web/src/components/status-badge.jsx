@@ -16,6 +16,10 @@ const statusConfig = {
   rejected: { className: "bg-destructive/15 text-destructive", label: "Rejected" },
   returned: { className: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400", label: "Returned" },
   damaged: { className: "bg-amber-500/15 text-amber-700 dark:text-amber-400", label: "Damaged" },
+  student: { className: "bg-primary/15 text-primary", label: "Student" },
+  instructor: { className: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400", label: "Instructor" },
+  lab_staff: { className: "bg-muted text-muted-foreground", label: "Lab Staff" },
+  admin: { className: "bg-muted text-muted-foreground", label: "Admin" },
 }
 
 export function StatusBadge({ status, className }) {
