@@ -7,33 +7,6 @@ import { StatusBadge } from "@/components/status-badge"
 import { incidentsAPI } from "@/api/incidents"
 import { ShieldCheck, AlertTriangle, PackageX, CheckCircle2, User } from "lucide-react"
 
-const mockIncidents = [
-  {
-    id: "1",
-    userId: "u1",
-    userName: "John Doe",
-    email: "john.doe@example.com",
-    equipment: "ESP32 Dev Kit",
-    penaltyType: "damaged_gear",
-    remarks: "Broken traces on PCB",
-    reportedAt: new Date().toISOString(),
-    resolved: false,
-    suspensionReason: "Handled equipment roughly",
-  },
-  {
-    id: "2",
-    userId: "u2",
-    userName: "Jane Smith",
-    email: "jane.smith@example.com",
-    equipment: "Raspberry Pi",
-    penaltyType: "overdue",
-    remarks: "Returned late",
-    reportedAt: new Date(Date.now() - 86400000 * 3).toISOString(),
-    resolved: true,
-    suspensionReason: null,
-  },
-]
-
 export default function AdminIncidents() {
   const [incidents, setIncidents] = useState([])
   const [loading, setLoading] = useState(true)
@@ -46,7 +19,7 @@ export default function AdminIncidents() {
       setLoading(true)
       const remote = await incidentsAPI.getAll()
       if (!mounted) return
-      setIncidents(remote.length ? remote : mockIncidents)
+      setIncidents(remote)
       setLoading(false)
     }
     load()

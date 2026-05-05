@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import edu.cit.migallos.techlend.dto.CreateLoanTransactionRequest;
+import edu.cit.migallos.techlend.dto.CreatePenaltyRequest;
 import edu.cit.migallos.techlend.dto.LoanDetailResponse;
 import edu.cit.migallos.techlend.dto.LoanTransactionResponse;
 import edu.cit.migallos.techlend.dto.ProcessLoanReturnRequest;
@@ -24,6 +25,7 @@ import edu.cit.migallos.techlend.entity.User;
 import edu.cit.migallos.techlend.enums.EquipmentItemStatus;
 import edu.cit.migallos.techlend.enums.LoanItemStatus;
 import edu.cit.migallos.techlend.enums.LoanTransactionStatus;
+import edu.cit.migallos.techlend.enums.PenaltyType;
 import edu.cit.migallos.techlend.repository.EquipmentItemRepository;
 import edu.cit.migallos.techlend.repository.LoanDetailRepository;
 import edu.cit.migallos.techlend.repository.LoanTransactionRepository;
@@ -38,15 +40,18 @@ public class LoanService {
     private final LoanTransactionRepository loanTransactionRepository;
     private final LoanDetailRepository loanDetailRepository;
     private final UserRepository userRepository;
+    private final PenaltyService penaltyService;
 
     public LoanService(EquipmentItemRepository equipmentItemRepository,
                        LoanTransactionRepository loanTransactionRepository,
                        LoanDetailRepository loanDetailRepository,
-                       UserRepository userRepository) {
+                       UserRepository userRepository,
+                       PenaltyService penaltyService) {
         this.equipmentItemRepository = equipmentItemRepository;
         this.loanTransactionRepository = loanTransactionRepository;
         this.loanDetailRepository = loanDetailRepository;
         this.userRepository = userRepository;
+        this.penaltyService = penaltyService;
     }
 
     @Transactional
@@ -251,6 +256,19 @@ public class LoanService {
         detail.setActualReturnTime(returnedAt);
         detail.setStaffRemarks(trimToNull(returnedItem.getStaffRemarks()));
         applyEquipmentStatusForReturnedItem(equipment, returnedStatus);
+        // Create a penalty record when item is DAMAGED or LOST
+        if (returnedStatus == LoanItemStatus.DAMAGED || returnedStatus == LoanItemStatus.LOST) {
+            CreatePenaltyRequest req = new CreatePenaltyRequest();
+            req.setUserId(detail.getTransaction().getBorrowerId());
+            req.setDetailId(detail.getDetailId());
+            req.setType(returnedStatus == LoanItemStatus.DAMAGED ? PenaltyType.DAMAGED_GEAR.name() : PenaltyType.LOST_GEAR.name());
+            req.setRemarks(trimToNull(returnedItem.getStaffRemarks()));
+            try {
+                penaltyService.createPenalty(req);
+            } catch (Exception ex) {
+                // intentionally ignore to avoid blocking return processing
+            }
+        }
     }
 
     private void applyEquipmentStatusForReturnedItem(EquipmentItem equipment, LoanItemStatus returnedStatus) {

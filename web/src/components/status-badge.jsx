@@ -21,6 +21,10 @@ const statusConfig = {
   instructor: { className: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400", label: "Instructor" },
   lab_staff: { className: "bg-muted text-muted-foreground", label: "Lab Staff" },
   admin: { className: "bg-muted text-muted-foreground", label: "Admin" },
+  damaged_gear: { className: "bg-amber-500/15 text-amber-700 dark:text-amber-400", label: "Damaged Gear" },
+  lost_gear: { className: "bg-destructive/15 text-destructive", label: "Lost Gear" },
+  overdue_return: { className: "bg-orange-500/15 text-orange-700 dark:text-orange-400", label: "Overdue Return" },
+  manual_suspension: { className: "bg-destructive text-white", label: "Manual Suspension" },
 }
 
 export function StatusBadge({ status, className }) {
