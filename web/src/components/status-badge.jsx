@@ -9,6 +9,7 @@ const statusConfig = {
   maintenance: { className: "bg-muted text-muted-foreground", label: "Maintenance" },
   lost: { className: "bg-destructive/15 text-destructive", label: "Lost" },
   pending: { className: "bg-amber-500/15 text-amber-700 dark:text-amber-400", label: "Pending" },
+  open: { className: "bg-destructive/15 text-destructive", label: "Open" },
   requested: { className: "bg-amber-500/15 text-amber-700 dark:text-amber-400", label: "Requested" },
   approved: { className: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400", label: "Approved" },
   active: { className: "bg-emerald-600 text-white", label: "Active" },
@@ -23,6 +24,7 @@ const statusConfig = {
   admin: { className: "bg-muted text-muted-foreground", label: "Admin" },
   damaged_gear: { className: "bg-amber-500/15 text-amber-700 dark:text-amber-400", label: "Damaged Gear" },
   lost_gear: { className: "bg-destructive/15 text-destructive", label: "Lost Gear" },
+  resolved: { className: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400", label: "Resolved" },
   overdue_return: { className: "bg-orange-500/15 text-orange-700 dark:text-orange-400", label: "Overdue Return" },
   manual_suspension: { className: "bg-destructive text-white", label: "Manual Suspension" },
 }

@@ -100,7 +100,23 @@ public class PenaltyService {
                 .orElseThrow(() -> new NoSuchElementException("Penalty not found"));
         penalty.setStatus(PenaltyStatus.RESOLVED);
         Penalty saved = penaltyRepository.save(penalty);
-        return toResponse(saved);
+        PenaltyResponse resp = toResponse(saved);
+
+        // After resolving, if the user has no other pending penalties, unsuspend them
+        if (saved.getUser() != null) {
+            UUID userId = saved.getUser().getUserId();
+            long pendingCount = penaltyRepository.countByUser_UserIdAndStatus(userId, PenaltyStatus.PENDING);
+            if (pendingCount == 0) {
+                User user = userRepository.findById(userId).orElse(null);
+                if (user != null && user.getStatus() == edu.cit.migallos.techlend.enums.UserStatus.SUSPENDED) {
+                    user.setStatus(edu.cit.migallos.techlend.enums.UserStatus.ACTIVE);
+                    user.setSuspensionReason(null);
+                    userRepository.save(user);
+                }
+            }
+        }
+
+        return resp;
     }
 
     private PenaltyResponse toResponse(Penalty p) {

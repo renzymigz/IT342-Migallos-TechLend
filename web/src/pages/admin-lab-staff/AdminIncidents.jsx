@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { StatusBadge } from "@/components/status-badge"
 import { incidentsAPI } from "@/api/incidents"
-import { ShieldCheck, AlertTriangle, PackageX, CheckCircle2, User } from "lucide-react"
+import { ShieldCheck, AlertTriangle, PackageX, CheckCircle2, User, MessageSquare, BookmarkMinus } from "lucide-react"
 
 export default function AdminIncidents() {
   const [incidents, setIncidents] = useState([])
@@ -49,6 +49,23 @@ export default function AdminIncidents() {
     await incidentsAPI.unsuspendUser(userId)
   }
 
+  const handleModalConfirm = async () => {
+    if (!resolveTarget) return
+    const isManual = resolveTarget.penaltyType === "manual_suspension"
+    if (isManual) {
+      // optimistic: remove manual suspension incidents for this user
+      setIncidents((prev) => prev.filter((i) => !(i.userId === resolveTarget.userId && i.penaltyType === "manual_suspension")))
+      await incidentsAPI.unsuspendUser(resolveTarget.userId)
+      setResolveTarget(null)
+      return
+    }
+
+    // default: resolve penalty
+    setIncidents((prev) => prev.map((i) => (i.id === resolveTarget.id ? { ...i, resolved: true } : i)))
+    await incidentsAPI.resolveIncident(resolveTarget.id)
+    setResolveTarget(null)
+  }
+
   return (
     <AdminLayout>
       <div className="flex flex-col gap-6">
@@ -72,8 +89,8 @@ export default function AdminIncidents() {
             </div>
           </div>
           <div className="flex items-center gap-3 rounded-lg border border-border bg-card p-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary/15">
-              <PackageX className="h-5 w-5 text-muted-foreground" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/15">
+              <PackageX className="h-5 w-5 text-amber-600" />
             </div>
             <div>
               <p className="text-2xl font-bold text-foreground">{incidents.length}</p>
@@ -131,25 +148,30 @@ export default function AdminIncidents() {
                 </CardHeader>
                 <CardContent className="flex flex-col gap-3 pt-0">
                   <div className="rounded-md border border-border bg-muted/40 p-3">
-                    <p className="text-sm text-foreground">{inc.remarks}</p>
+                    <div className="mb-2 flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                      <MessageSquare className=" h-4 w-4 text-muted-foreground" />
+                      <p className="text-xs text-muted-foreground">Staff Remarks</p>
+                    </div>
+                  
+                    <p className="text-sm text-foreground mb-5">{inc.remarks}</p>
                     {inc.suspensionReason && (
                       <div className="mt-2 flex items-start justify-between gap-4">
                         <div>
-                          <p className="text-xs text-muted-foreground">Suspension Reason</p>
-                          <p className="text-sm text-foreground">{inc.suspensionReason}</p>
-                        </div>
-                        <div>
-                          <Button size="sm" onClick={() => handleUnsuspend(inc.userId)}>
-                            Unsuspend
-                          </Button>
-                        </div>
+                              <div className="mb-2 flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                              <BookmarkMinus className="h-4 w-4 text-muted-foreground" />
+                               <p className="text-xs text-muted-foreground">Suspension Reason</p>
+                              </div>
+                         
+                              <p className="text-sm text-foreground">{inc.suspensionReason}</p>
+                            </div>
                       </div>
                     )}
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 w-full">
                     {!inc.resolved && (
-                      <Button variant="outline" onClick={() => setResolveTarget(inc)}>
+                      <Button onClick={() => setResolveTarget(inc)} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center">
+                        <CheckCircle2 className="h-4 w-4 mr-2" />
                         Resolve
                       </Button>
                     )}
@@ -165,10 +187,12 @@ export default function AdminIncidents() {
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-foreground">
                 <ShieldCheck className="h-5 w-5 text-foreground" />
-                Resolve Incident
+                {resolveTarget?.penaltyType === "manual_suspension" ? "Unsuspend User" : "Resolve Incident"}
               </DialogTitle>
               <DialogDescription>
-                This will mark the incident as resolved and (optionally) lift any suspension on the user.
+                {resolveTarget?.penaltyType === "manual_suspension"
+                  ? "This will lift the manual suspension for the user."
+                  : "This will mark the incident as resolved and (optionally) lift any suspension on the user."}
               </DialogDescription>
             </DialogHeader>
 
@@ -182,7 +206,7 @@ export default function AdminIncidents() {
 
             <DialogFooter className="gap-2 sm:gap-0">
               <Button variant="outline" onClick={() => setResolveTarget(null)}>Cancel</Button>
-              <Button onClick={handleResolve}>Confirm Resolve</Button>
+              <Button onClick={handleModalConfirm} className="bg-emerald-600 hover:bg-emerald-700 text-white">{resolveTarget?.penaltyType === "manual_suspension" ? "Unsuspend" : "Confirm Resolve"}</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
