@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 import { useCart } from "@/context/CartContext"
+import { useAuth } from "@/context/AuthContext"
 import { loanAPI } from "@/api/loan"
 import { getUpcomingHolidays } from "@/api/googleCalendar"
 import { Button } from "@/components/ui/button"
@@ -19,6 +20,7 @@ export function CartSheet() {
     import.meta.env.VITE_GOOGLE_HOLIDAY_CALENDAR_ID || "en.philippines#holiday@group.v.calendar.google.com"
 
   const { items, cartCount, isCartOpen, removeItem, clearItems, closeCart } = useCart()
+  const { user } = useAuth()
   const [requestDate, setRequestDate] = useState("")
   const [borrowerNote, setBorrowerNote] = useState("")
   const [submitting, setSubmitting] = useState(false)
@@ -45,7 +47,14 @@ export function CartSheet() {
   }, [holidays])
 
   const isSubmitDisabled = useMemo(() => {
-    return submitting || items.length === 0 || !requestDate || !borrowerNote.trim() || Boolean(requestDateError)
+    return (
+      submitting ||
+      items.length === 0 ||
+      !requestDate ||
+      !borrowerNote.trim() ||
+      Boolean(requestDateError) ||
+      user?.status === "SUSPENDED"
+    )
   }, [submitting, items.length, requestDate, borrowerNote, requestDateError])
 
   useEffect(() => {
@@ -209,6 +218,12 @@ export function CartSheet() {
 
           {submitError && <p className="text-xs text-destructive">{submitError}</p>}
           {submitSuccess && <p className="text-xs text-emerald-600">{submitSuccess}</p>}
+
+          {user?.status === "SUSPENDED" && (
+            <p className="text-xs text-destructive">
+              You cannot submit requests while suspended{user?.suspensionReason ? `: ${user.suspensionReason}` : "."}
+            </p>
+          )}
         </div>
 
         <div className="border-t border-border px-5 py-4">

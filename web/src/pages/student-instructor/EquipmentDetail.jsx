@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
+import { useAuth } from "@/context/AuthContext"
 import { Link, useParams } from "react-router-dom"
 import { equipmentAPI } from "@/api/equipment"
 import { getUpcomingHolidays } from "@/api/googleCalendar"
@@ -44,6 +45,7 @@ export default function EquipmentDetail() {
 
   const { equipmentId } = useParams()
   const { addItem, items } = useCart()
+  const { user } = useAuth()
   const [equipment, setEquipment] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
@@ -150,7 +152,9 @@ export default function EquipmentDetail() {
   }, [items, equipment])
 
   const handleAddToCart = () => {
-    if (equipment?.status !== "available") return
+    const isInstructor = user?.role?.toUpperCase() === "INSTRUCTOR"
+    if (equipment == null) return
+    if (equipment.status !== "available" && !(isInstructor && equipment.status === "reserved")) return
 
     addItem({
       id: equipment.equipmentId,
@@ -164,10 +168,11 @@ export default function EquipmentDetail() {
     })
   }
 
+  const isInstructor = user?.role?.toUpperCase() === "INSTRUCTOR"
   let addToCartLabel = "Currently Unavailable"
   if (isInCart) {
     addToCartLabel = "In Cart"
-  } else if (equipment?.status === "available") {
+  } else if (equipment?.status === "available" || (isInstructor && equipment?.status === "reserved")) {
     addToCartLabel = "Add to Cart"
   }
 
@@ -443,7 +448,7 @@ export default function EquipmentDetail() {
                   <Button
                     size="lg"
                     className="w-full text-base"
-                    disabled={equipment.status !== "available" || isInCart}
+                    disabled={!(equipment.status === "available" || (isInstructor && equipment.status === "reserved")) || isInCart}
                     onClick={handleAddToCart}
                   >
                     <ShoppingCart className="mr-2 h-5 w-5" />

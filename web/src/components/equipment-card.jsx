@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { StatusBadge } from "@/components/status-badge"
+import { useAuth } from "@/context/AuthContext"
 import { ShoppingCart, Cpu, Wifi, Thermometer, Monitor, Cable, ServerCog } from "lucide-react"
 
 const categoryIcons = {
@@ -13,7 +14,10 @@ const categoryIcons = {
 }
 
 export function EquipmentCard({ equipment, onAddToCart, inCart, onViewDetail }) {
+  const { user } = useAuth()
+  const isInstructor = user?.role?.toUpperCase() === "INSTRUCTOR"
   const isAvailable = equipment.status === "available"
+  const canAddWhenReserved = isInstructor && equipment.status === "reserved"
 
   return (
     <Card className="group flex flex-col overflow-hidden border-border transition-shadow hover:shadow-md">
@@ -59,11 +63,11 @@ export function EquipmentCard({ equipment, onAddToCart, inCart, onViewDetail }) 
             size="sm"
             className="w-full"
             variant={inCart ? "secondary" : "default"}
-            disabled={!isAvailable || inCart}
+            disabled={!(isAvailable || canAddWhenReserved) || inCart}
             onClick={() => onAddToCart(equipment)}
           >
             <ShoppingCart className="mr-1.5 h-3.5 w-3.5" />
-            {inCart ? "In Cart" : (isAvailable ? "Add to Cart" : "Unavailable")}
+            {inCart ? "In Cart" : (isAvailable || canAddWhenReserved ? "Add to Cart" : "Unavailable")}
           </Button>
         </div>
       </CardContent>

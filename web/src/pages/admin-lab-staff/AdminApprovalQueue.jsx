@@ -18,6 +18,7 @@ export default function AdminApprovalQueue() {
   const [pendingTransactions, setPendingTransactions] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
+  const [blockedEquipmentIds, setBlockedEquipmentIds] = useState(new Set())
 
   const [selectedTxn, setSelectedTxn] = useState(null)
   const [staffRemark, setStaffRemark] = useState("")
@@ -26,8 +27,26 @@ export default function AdminApprovalQueue() {
   const loadPendingLoans = async () => {
     setLoading(true)
     try {
-      const res = await loanAPI.getPendingLoansForApproval()
-      setPendingTransactions(res.data.data || [])
+      const [pendingRes, approvedRes, activeRes] = await Promise.all([
+        loanAPI.getPendingLoansForApproval(),
+        loanAPI.getApprovedLoansForPickup(),
+        loanAPI.getActiveLoans(),
+      ])
+
+      const pending = pendingRes.data.data || []
+      setPendingTransactions(pending)
+
+      const approved = approvedRes.data.data || []
+      const active = activeRes.data.data || []
+
+      // Build set of equipment IDs that are either awaiting pickup (approved) or currently borrowed
+      const blocked = new Set()
+      ;[...approved, ...active].forEach((txn) => {
+        ;(txn.items || []).forEach((it) => {
+          if (it.equipmentId) blocked.add(it.equipmentId)
+        })
+      })
+      setBlockedEquipmentIds(blocked)
       setError("")
     } catch (err) {
       setError(err.response?.data?.error?.message || "Failed to load pending requests.")
@@ -58,6 +77,8 @@ export default function AdminApprovalQueue() {
     setSelectedTxn(null)
     setStaffRemark("")
   }
+
+  const selectedIsBlocked = selectedTxn && (selectedTxn.items || []).some((it) => blockedEquipmentIds.has(it.equipmentId))
 
   const handleDecision = async (status) => {
     if (!selectedTxn) return
@@ -110,7 +131,7 @@ export default function AdminApprovalQueue() {
                 }`}
                 onClick={() => openReview(transaction)}
               >
-                <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+                  <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex flex-col gap-1.5">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="text-sm font-semibold text-foreground">
@@ -136,6 +157,11 @@ export default function AdminApprovalQueue() {
                         {(transaction.items || []).length === 1 ? "" : "s"}
                       </span>
                     </div>
+
+                    {/* show if this pending txn contains any blocked equipment */}
+                    {((transaction.items || []).some((it) => blockedEquipmentIds.has(it.equipmentId))) && (
+                      <p className="text-xs text-destructive">Contains item already awaiting pickup or borrowed — approval disabled</p>
+                    )}
 
                     <p className="line-clamp-1 text-xs italic text-muted-foreground">
                       &quot;{transaction.borrowerNote || "No borrower note."}&quot;
@@ -164,7 +190,7 @@ export default function AdminApprovalQueue() {
               </Button>
             </div>
 
-            <div className="space-y-4 px-5 py-4">
+                <div className="space-y-4 px-5 py-4">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary">
                   <User className="h-5 w-5 text-muted-foreground" />
@@ -233,7 +259,7 @@ export default function AdminApprovalQueue() {
                   size="lg"
                   className="flex-1"
                   onClick={() => handleDecision("APPROVED")}
-                  disabled={deciding}
+                  disabled={deciding || selectedIsBlocked}
                 >
                   {deciding ? (
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
@@ -257,6 +283,9 @@ export default function AdminApprovalQueue() {
                   Reject
                 </Button>
               </div>
+              {selectedTxn && (selectedTxn.items || []).some((it) => blockedEquipmentIds.has(it.equipmentId)) && (
+                <p className="mt-2 text-xs text-destructive">This request contains equipment that is already awaiting pickup or currently borrowed. Approving it is disabled to prevent conflicts.</p>
+              )}
             </div>
           </div>
         </div>

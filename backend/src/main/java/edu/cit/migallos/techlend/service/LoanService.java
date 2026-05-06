@@ -26,6 +26,7 @@ import edu.cit.migallos.techlend.enums.EquipmentItemStatus;
 import edu.cit.migallos.techlend.enums.LoanItemStatus;
 import edu.cit.migallos.techlend.enums.LoanTransactionStatus;
 import edu.cit.migallos.techlend.enums.PenaltyType;
+import edu.cit.migallos.techlend.enums.Role;
 import edu.cit.migallos.techlend.enums.UserStatus;
 import edu.cit.migallos.techlend.repository.EquipmentItemRepository;
 import edu.cit.migallos.techlend.repository.LoanDetailRepository;
@@ -67,8 +68,16 @@ public class LoanService {
             throw new NoSuchElementException("One or more selected equipment items were not found");
         }
 
+        // Determine borrower role to allow instructor overrides for reserved items
+        User borrower = userRepository.findById(borrowerId).orElse(null);
+        boolean isInstructor = borrower != null && borrower.getRole() == Role.INSTRUCTOR;
+
         for (EquipmentItem item : equipmentItems) {
             if (item.getStatus() != EquipmentItemStatus.AVAILABLE) {
+                // Instructors may request items that are currently RESERVED
+                if (isInstructor && item.getStatus() == EquipmentItemStatus.RESERVED) {
+                    continue;
+                }
                 throw new IllegalArgumentException("Equipment item is not available: " + item.getPropertyTag());
             }
         }
@@ -77,7 +86,12 @@ public class LoanService {
         transaction.setBorrowerId(borrowerId);
         transaction.setStatus(LoanTransactionStatus.PENDING);
         transaction.setBorrowerNote(request.getBorrowerNote().trim());
-        transaction.setRequestedTime(LocalDateTime.now());
+        // Prioritize instructor requests by setting requestedTime slightly earlier
+        if (isInstructor) {
+            transaction.setRequestedTime(LocalDateTime.now().minusSeconds(1));
+        } else {
+            transaction.setRequestedTime(LocalDateTime.now());
+        }
         transaction.setExpectedReturnTime(request.getRequestDate().atStartOfDay());
 
         LoanTransaction savedTransaction = loanTransactionRepository.save(transaction);
