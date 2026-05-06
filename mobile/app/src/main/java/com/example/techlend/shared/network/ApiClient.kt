@@ -1,6 +1,7 @@
-package com.example.techlend.network
+package com.example.techlend.shared.network
 
 import com.example.techlend.BuildConfig
+import com.example.techlend.features.auth.AuthApiService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit

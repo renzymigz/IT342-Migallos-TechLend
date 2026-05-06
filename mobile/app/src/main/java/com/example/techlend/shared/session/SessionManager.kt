@@ -1,4 +1,4 @@
-package com.example.techlend.auth
+package com.example.techlend.shared.session
 
 import android.content.Context
 

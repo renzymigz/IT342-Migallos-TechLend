@@ -1,4 +1,4 @@
-package com.example.techlend
+package com.example.techlend.features.user
 
 import android.content.Intent
 import android.os.Bundle
@@ -7,9 +7,11 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.techlend.auth.SessionManager
-import com.example.techlend.network.ApiClient
-import com.example.techlend.network.ApiErrorParser
+import com.example.techlend.R
+import com.example.techlend.features.auth.LoginActivity
+import com.example.techlend.shared.network.ApiClient
+import com.example.techlend.shared.network.ApiErrorParser
+import com.example.techlend.shared.session.SessionManager
 import java.io.IOException
 import kotlinx.coroutines.launch
 
@@ -93,6 +95,5 @@ class DashboardActivity : AppCompatActivity() {
 
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-
     }
 }

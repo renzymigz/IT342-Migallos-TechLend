@@ -1,5 +1,6 @@
-package com.example.techlend.network
+package com.example.techlend.shared.network
 
+import com.example.techlend.features.auth.AuthApiResponse
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.util.LinkedHashMap
@@ -8,7 +9,7 @@ import retrofit2.Response
 object ApiErrorParser {
     private val gson = Gson()
 
-    fun <T> getMessage(response: Response<ApiResponse<T>>, fallback: String): String {
+    fun <T> getMessage(response: Response<AuthApiResponse<T>>, fallback: String): String {
         val bodyMessage = response.body()?.error?.message
         if (!bodyMessage.isNullOrBlank()) {
             return bodyMessage
@@ -17,8 +18,8 @@ object ApiErrorParser {
         val errorBody = response.errorBody()?.string()
         if (!errorBody.isNullOrBlank()) {
             return runCatching {
-                val type = object : TypeToken<ApiResponse<Any>>() {}.type
-                val parsed: ApiResponse<Any> = gson.fromJson(errorBody, type)
+                val type = object : TypeToken<AuthApiResponse<Any>>() {}.type
+                val parsed: AuthApiResponse<Any> = gson.fromJson(errorBody, type)
                 val detailsMessage = formatDetails(parsed.error?.details)
                 if (!detailsMessage.isNullOrBlank()) detailsMessage else parsed.error?.message
             }.getOrNull().orEmpty().ifBlank { fallback }

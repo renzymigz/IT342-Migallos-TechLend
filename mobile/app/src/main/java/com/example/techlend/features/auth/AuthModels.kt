@@ -1,15 +1,17 @@
-package com.example.techlend.network
+package com.example.techlend.features.auth
 
+import com.example.techlend.features.user.UserProfileResponse
 import com.google.gson.annotations.SerializedName
 
-data class ApiResponse<T>(
+// Wrapper for all API responses
+data class AuthApiResponse<T>(
     @SerializedName("success") val success: Boolean,
     @SerializedName("data") val data: T?,
-    @SerializedName("error") val error: ApiError?,
+    @SerializedName("error") val error: AuthApiError?,
     @SerializedName("timestamp") val timestamp: String?
 )
 
-data class ApiError(
+data class AuthApiError(
     @SerializedName("code") val code: String?,
     @SerializedName("message") val message: String?,
     @SerializedName("details") val details: Any?
@@ -37,16 +39,4 @@ data class AuthResponse(
 data class TokenPair(
     @SerializedName("accessToken") val accessToken: String?,
     @SerializedName("refreshToken") val refreshToken: String?
-)
-
-data class UserProfileResponse(
-    @SerializedName("userId") val userId: String?,
-    @SerializedName("schoolId") val schoolId: String?,
-    @SerializedName("firstName") val firstName: String?,
-    @SerializedName("lastName") val lastName: String?,
-    @SerializedName("email") val email: String?,
-    @SerializedName("contactNumber") val contactNumber: String?,
-    @SerializedName("authProvider") val authProvider: String?,
-    @SerializedName("role") val role: String?,
-    @SerializedName("status") val status: String?
 )
