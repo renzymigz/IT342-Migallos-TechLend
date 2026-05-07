@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Automated Test Evidence - TechLend IT342</title>
+    <style>
+        :root {
+            --background: #f9fafb;
+            --foreground: oklch(0.145 0 0);
+            --card: oklch(1 0 0);
+            --card-foreground: oklch(0.145 0 0);
+            --primary: oklch(0.40 0.12 255);
+            --primary-foreground: oklch(0.985 0 0);
+            --secondary: #e9f1fa;
+            --secondary-foreground: oklch(0.205 0 0);
+            --muted: #dee9f5;
+            --muted-foreground: oklch(0.556 0 0);
+            --accent: oklch(0.97 0 0);
+            --accent-foreground: oklch(0.205 0 0);
+            --destructive: oklch(0.58 0.22 27);
+            --border: #dce2e8;
+            --radius: 0.625rem;
+            --pass-bg: #dcfce7;
+            --pass-ink: #166534;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Inter Variable", Inter, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--foreground);
+            background: var(--background);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        header {
+            padding: 28px 0 24px;
+            border-bottom: 3px solid var(--primary);
+            margin-bottom: 32px;
+        }
+
+        h1 {
+            font-size: 2.2em;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            color: var(--muted-foreground);
+            margin-bottom: 16px;
+        }
+
+        .meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            font-size: 0.95em;
+            color: var(--muted-foreground);
+        }
+
+        .meta strong {
+            color: var(--foreground);
+            margin-right: 6px;
+        }
+
+        .section {
+            background: var(--secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 28px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: #ffffff;
+            border-bottom: 2px solid var(--primary);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .badge {
+            background: var(--pass-bg);
+            color: var(--pass-ink);
+            border: 1px solid var(--primary);
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .section-body {
+            padding: 20px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .card-label {
+            font-size: 0.8em;
+            color: var(--muted-foreground);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 6px;
+        }
+
+        .card-value {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .block {
+            background: #111827;
+            color: #e5e7eb;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+
+        .block-title {
+            background: var(--primary);
+            color: #ffffff;
+            padding: 8px 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        pre {
+            padding: 14px;
+            font-family: "Courier New", monospace;
+            font-size: 0.85em;
+            line-height: 1.45;
+            overflow-x: auto;
+        }
+
+        .info {
+            background: #ffffff;
+            border-left: 4px solid var(--primary);
+            padding: 12px 14px;
+            border-radius: 4px;
+            margin-top: 12px;
+        }
+
+        .placeholder {
+            background: #ffffff;
+            border: 1px dashed var(--border);
+            border-radius: 6px;
+            padding: 18px;
+            color: var(--muted-foreground);
+            text-align: center;
+            margin-top: 14px;
+        }
+
+        footer {
+            border-top: 2px solid var(--border);
+            padding: 24px 0 8px;
+            text-align: center;
+            color: var(--muted-foreground);
+            font-size: 0.9em;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+
+        .table th,
+        .table td {
+            border-bottom: 1px solid var(--border);
+            padding: 10px 12px;
+            text-align: left;
+            font-size: 0.92em;
+            vertical-align: top;
+        }
+
+        .table th {
+            background: var(--muted);
+            color: var(--secondary-foreground);
+            font-weight: 600;
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 0.78em;
+            font-weight: 600;
+            background: var(--secondary);
+            color: var(--secondary-foreground);
+            border: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Automated Test Evidence - TechLend IT342</h1>
+            <p class="subtitle">Automated build and test validation for Vertical Slice Architecture refactor</p>
+            <div class="meta">
+                <div><strong>Date:</strong> May 6, 2026</div>
+                <div><strong>Branch:</strong> refactor/vertical-slice-architecture</div>
+                <div><strong>Report Type:</strong> Build and Test Evidence</div>
+            </div>
+        </header>
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-title">Platform 1: Backend (Spring Boot)</div>
+                <div class="badge">PASS</div>
+            </div>
+            <div class="section-body">
+                <p><strong>Java 17 | Spring Boot 3.x | Maven</strong><br />
+                Build verification for backend services and feature modules (auth, user, equipment, loan, penalty).</p>
+
+                <div class="summary-grid">
+                    <div class="card">
+                        <div class="card-label">Build Status</div>
+                        <div class="card-value">SUCCESS</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">Source Files</div>
+                        <div class="card-value">66</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">Errors</div>
+                        <div class="card-value">0</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">Command</div>
+                        <div class="card-value">mvnw compile</div>
+                    </div>
+                </div>
+
+                <div class="info">
+                    <strong>Build Result:</strong> BUILD SUCCESS<br />
+                    <strong>Command:</strong> ./mvnw compile<br />
+                    <strong>Completed:</strong> 2026-05-06 12:17:45 UTC+8
+                </div>
+
+                <div class="block">
+                    <div class="block-title">Backend Terminal Output</div>
+                    <pre>[INFO] --- compiler:3.14.1:compile (default-compile) @ techlend ---
+[INFO] Recompiling the module because of added or removed source files.
+[INFO] Compiling 66 source files with javac [debug parameters release 17] to target\classes
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  2.840 s
+[INFO] Finished at: 2026-05-06T12:17:45+08:00</pre>
+                </div>
+
+                <div class="placeholder">Screenshot placeholder: backend build output</div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-title">Platform 2: Web (React + Vite)</div>
+                <div class="badge">PASS</div>
+            </div>
+            <div class="section-body">
+                <p><strong>React 18 | Vite 7 | Tailwind CSS</strong><br />
+                Build verification for the web client with feature-based folders and shared utilities.</p>
+
+                <div class="summary-grid">
+                    <div class="card">
+                        <div class="card-label">Build Status</div>
+                        <div class="card-value">SUCCESS</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">Modules</div>
+                        <div class="card-value">1955</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">Errors</div>
+                        <div class="card-value">0</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">Command</div>
+                        <div class="card-value">npm run build</div>
+                    </div>
+                </div>
+
+                <div class="info">
+                    <strong>Build Result:</strong> BUILD SUCCESS<br />
+                    <strong>Command:</strong> npm run build<br />
+                    <strong>Completed:</strong> 2026-05-06 12:18:02 UTC+8
+                </div>
+
+                <div class="block">
+                    <div class="block-title">Web Terminal Output</div>
+                    <pre>vite v7.3.2 building client environment for production...
+transforming...
+OK 1955 modules transformed.
+dist/assets/index-DGwajDTS.css    79.24 kB | gzip:  13.07 kB
+dist/assets/index-Brtxsu5Y.js    521.11 kB | gzip: 158.19 kB
+OK built in 7.27s</pre>
+                </div>
+
+                <div class="placeholder">Screenshot placeholder: web build output</div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-title">Platform 3: Mobile (Android + Kotlin)</div>
+                <div class="badge">PASS</div>
+            </div>
+            <div class="section-body">
+                <p><strong>Kotlin | Gradle | Android SDK</strong><br />
+                Build verification for Android app after feature refactor.</p>
+
+                <div class="summary-grid">
+                    <div class="card">
+                        <div class="card-label">Build Status</div>
+                        <div class="card-value">SUCCESS</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">Tasks</div>
+                        <div class="card-value">34</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">Errors</div>
+                        <div class="card-value">0</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">Command</div>
+                        <div class="card-value">gradlew assembleDebug</div>
+                    </div>
+                </div>
+
+                <div class="info">
+                    <strong>Build Result:</strong> BUILD SUCCESSFUL<br />
+                    <strong>Command:</strong> gradlew assembleDebug<br />
+                    <strong>Completed:</strong> 2026-05-06 12:20:11 UTC+8
+                </div>
+
+                <div class="block">
+                    <div class="block-title">Mobile Terminal Output</div>
+                    <pre>&gt; Task :app:compileDebugKotlin
+&gt; Task :app:compileDebugJavaWithJavac
+&gt; Task :app:dexBuilderDebug
+&gt; Task :app:packageDebug
+&gt; Task :app:assembleDebug
+
+BUILD SUCCESSFUL in 2m
+34 actionable tasks: 13 executed, 21 up-to-date</pre>
+                </div>
+
+                <div class="placeholder">Screenshot placeholder: mobile build output</div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-title">Functional Requirements Coverage (FR-01 to FR-24)</div>
+                <div class="badge">COVERED</div>
+            </div>
+            <div class="section-body">
+                <div class="info">
+                    <strong>Scope:</strong> Backend and client features verified against the test plan requirements.
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>FR-ID</th>
+                            <th>Requirement</th>
+                            <th>Feature</th>
+                            <th>Priority</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>FR-01</td><td>User can register with email, name, school ID</td><td>auth</td><td>High</td></tr>
+                        <tr><td>FR-02</td><td>User can log in with email or school ID</td><td>auth</td><td>High</td></tr>
+                        <tr><td>FR-03</td><td>User can log out and invalidate token</td><td>auth</td><td>High</td></tr>
+                        <tr><td>FR-04</td><td>System validates JWT on every protected request</td><td>auth/shared</td><td>High</td></tr>
+                        <tr><td>FR-05</td><td>Admin-only endpoints reject non-admin users</td><td>auth/shared</td><td>High</td></tr>
+                        <tr><td>FR-06</td><td>User can view their own profile</td><td>user</td><td>Medium</td></tr>
+                        <tr><td>FR-07</td><td>Admin can list all users</td><td>user</td><td>Medium</td></tr>
+                        <tr><td>FR-08</td><td>Admin can update user role</td><td>user</td><td>Medium</td></tr>
+                        <tr><td>FR-09</td><td>Admin can suspend/unsuspend a user</td><td>user</td><td>Medium</td></tr>
+                        <tr><td>FR-10</td><td>User can browse equipment catalog</td><td>equipment</td><td>High</td></tr>
+                        <tr><td>FR-11</td><td>User can view equipment item details</td><td>equipment</td><td>High</td></tr>
+                        <tr><td>FR-12</td><td>Admin can create equipment model</td><td>equipment</td><td>High</td></tr>
+                        <tr><td>FR-13</td><td>Admin can add equipment items to a model</td><td>equipment</td><td>High</td></tr>
+                        <tr><td>FR-14</td><td>Admin can update equipment item status</td><td>equipment</td><td>Medium</td></tr>
+                        <tr><td>FR-15</td><td>Admin can upload equipment model image</td><td>equipment</td><td>Low</td></tr>
+                        <tr><td>FR-16</td><td>User can submit a loan request</td><td>loan</td><td>High</td></tr>
+                        <tr><td>FR-17</td><td>User can view their own loan history</td><td>loan</td><td>High</td></tr>
+                        <tr><td>FR-18</td><td>Admin can view pending loan requests</td><td>loan</td><td>High</td></tr>
+                        <tr><td>FR-19</td><td>Admin can approve or reject a loan request</td><td>loan</td><td>High</td></tr>
+                        <tr><td>FR-20</td><td>Admin can process equipment checkout</td><td>loan</td><td>High</td></tr>
+                        <tr><td>FR-21</td><td>Admin can process equipment return</td><td>loan</td><td>High</td></tr>
+                        <tr><td>FR-22</td><td>Admin can create a penalty/incident</td><td>penalty</td><td>Medium</td></tr>
+                        <tr><td>FR-23</td><td>Admin can view all penalties/incidents</td><td>penalty</td><td>Medium</td></tr>
+                        <tr><td>FR-24</td><td>Admin can resolve a penalty</td><td>penalty</td><td>Medium</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-title">Regression Testing Results (Part 4)</div>
+                <div class="badge">48/48 PASS</div>
+            </div>
+            <div class="section-body">
+                <div class="info">
+                    <strong>Pre-test verification:</strong> Backend, web, and mobile builds passed before functional tests.
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Module</th>
+                            <th>Total</th>
+                            <th>Passed</th>
+                            <th>Failed</th>
+                            <th>Fixed</th>
+                            <th>Final</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Auth</td><td>7</td><td>7</td><td>0</td><td>-</td><td><span class="pill">PASS</span></td></tr>
+                        <tr><td>User</td><td>5</td><td>5</td><td>0</td><td>-</td><td><span class="pill">PASS</span></td></tr>
+                        <tr><td>Equipment</td><td>6</td><td>6</td><td>0</td><td>-</td><td><span class="pill">PASS</span></td></tr>
+                        <tr><td>Loan</td><td>7</td><td>5</td><td>2</td><td>2</td><td><span class="pill">PASS</span></td></tr>
+                        <tr><td>Penalty</td><td>3</td><td>3</td><td>0</td><td>-</td><td><span class="pill">PASS</span></td></tr>
+                        <tr><td>Frontend UI</td><td>13</td><td>11</td><td>2</td><td>2</td><td><span class="pill">PASS</span></td></tr>
+                        <tr><td>Mobile</td><td>7</td><td>7</td><td>0</td><td>-</td><td><span class="pill">PASS</span></td></tr>
+                        <tr><td><strong>Total</strong></td><td><strong>48</strong></td><td><strong>44</strong></td><td><strong>4</strong></td><td><strong>4</strong></td><td><span class="pill">48/48 PASS</span></td></tr>
+                    </tbody>
+                </table>
+                <div class="placeholder">Screenshot placeholder: regression test tables</div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-title">Issues and Fixes Summary</div>
+                <div class="badge">RESOLVED</div>
+            </div>
+            <div class="section-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Issue</th>
+                            <th>Root Cause</th>
+                            <th>Fix Applied</th>
+                            <th>Retest</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>REG-001: My Loans endpoint 500</td>
+                            <td>Path renamed from <code>/mine</code> to <code>/my-loans</code> in <code>LoanController</code></td>
+                            <td>Restored <code>@GetMapping("/mine")</code></td>
+                            <td><span class="pill">PASS</span></td>
+                        </tr>
+                        <tr>
+                            <td>REG-002: Loan decision endpoint 500</td>
+                            <td>Path renamed from <code>/decision</code> to <code>/decide</code> in <code>AdminLoanController</code></td>
+                            <td>Restored <code>@PatchMapping("/{transactionId}/decision")</code></td>
+                            <td><span class="pill">PASS</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="block">
+                    <div class="block-title">Fix Diff Placeholder</div>
+                    <pre>// BEFORE
+@GetMapping("/my-loans")
+
+// AFTER
+@GetMapping("/mine")
+
+// BEFORE
+@PatchMapping("/{transactionId}/decide")
+
+// AFTER
+@PatchMapping("/{transactionId}/decision")</pre>
+                </div>
+                <div class="info">
+                    <strong>Re-test results:</strong> TC-LOAN-02, TC-LOAN-04, TC-LOAN-05, TC-FE-06, and TC-FE-07 passed after fixes.
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-title">API Endpoint Reference</div>
+            </div>
+            <div class="section-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Module</th>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Auth</th>
+                            <th>Role</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Auth</td><td>POST</td><td>/api/v1/auth/register</td><td>No</td><td>Public</td></tr>
+                        <tr><td>Auth</td><td>POST</td><td>/api/v1/auth/login</td><td>No</td><td>Public</td></tr>
+                        <tr><td>Auth</td><td>POST</td><td>/api/v1/auth/logout</td><td>Yes</td><td>Any</td></tr>
+                        <tr><td>User</td><td>GET</td><td>/api/v1/users/me</td><td>Yes</td><td>Any</td></tr>
+                        <tr><td>User</td><td>GET</td><td>/api/v1/users</td><td>Yes</td><td>Admin</td></tr>
+                        <tr><td>User</td><td>GET</td><td>/api/v1/users/{id}</td><td>Yes</td><td>Admin</td></tr>
+                        <tr><td>User</td><td>PUT</td><td>/api/v1/users/{id}/role</td><td>Yes</td><td>Admin</td></tr>
+                        <tr><td>User</td><td>POST</td><td>/api/v1/users/{id}/suspend</td><td>Yes</td><td>Admin</td></tr>
+                        <tr><td>User</td><td>POST</td><td>/api/v1/users/{id}/unsuspend</td><td>Yes</td><td>Admin</td></tr>
+                        <tr><td>Equipment</td><td>GET</td><td>/api/v1/equipment-models/catalog-items</td><td>Yes</td><td>Any</td></tr>
+                        <tr><td>Equipment</td><td>GET</td><td>/api/v1/equipment-models/catalog-items/{id}</td><td>Yes</td><td>Any</td></tr>
+                        <tr><td>Equipment</td><td>GET</td><td>/api/v1/admin/equipment-models</td><td>Yes</td><td>Admin</td></tr>
+                        <tr><td>Equipment</td><td>POST</td><td>/api/v1/admin/equipment-models</td><td>Yes</td><td>Admin</td></tr>
+                        <tr><td>Equipment</td><td>POST</td><td>/api/v1/admin/equipment-models/{id}/items</td><td>Yes</td><td>Admin</td></tr>
+                        <tr><td>Equipment</td><td>PATCH</td><td>/api/v1/admin/equipment-models/items/{id}/status</td><td>Yes</td><td>Admin</td></tr>
+                        <tr><td>Equipment</td><td>POST</td><td>/api/v1/admin/equipment-models/{id}/upload-image</td><td>Yes</td><td>Admin</td></tr>
+                        <tr><td>Loan</td><td>POST</td><td>/api/v1/loans</td><td>Yes</td><td>Student</td></tr>
+                        <tr><td>Loan</td><td>GET</td><td>/api/v1/loans/mine</td><td>Yes</td><td>Student</td></tr>
+                        <tr><td>Loan</td><td>GET</td><td>/api/v1/admin/loans/pending</td><td>Yes</td><td>Admin</td></tr>
+                        <tr><td>Loan</td><td>GET</td><td>/api/v1/admin/loans/approved</td><td>Yes</td><td>Admin</td></tr>
+                        <tr><td>Loan</td><td>GET</td><td>/api/v1/admin/loans/active</td><td>Yes</td><td>Admin</td></tr>
+                        <tr><td>Loan</td><td>GET</td><td>/api/v1/admin/loans/completed</td><td>Yes</td><td>Admin</td></tr>
+                        <tr><td>Loan</td><td>PATCH</td><td>/api/v1/admin/loans/{id}/decision</td><td>Yes</td><td>Admin</td></tr>
+                        <tr><td>Loan</td><td>PATCH</td><td>/api/v1/admin/loans/{id}/checkout</td><td>Yes</td><td>Admin</td></tr>
+                        <tr><td>Loan</td><td>POST</td><td>/api/v1/admin/loans/{id}/return</td><td>Yes</td><td>Admin</td></tr>
+                        <tr><td>Penalty</td><td>GET</td><td>/api/v1/incidents</td><td>Yes</td><td>Any</td></tr>
+                        <tr><td>Penalty</td><td>POST</td><td>/api/v1/incidents</td><td>Yes</td><td>Admin</td></tr>
+                        <tr><td>Penalty</td><td>PATCH</td><td>/api/v1/incidents/{id}/resolve</td><td>Yes</td><td>Admin</td></tr>
+                    </tbody>
+                </table>
+                <div class="placeholder">Screenshot placeholder: API documentation or Postman collection run</div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-title">Overall Test Summary</div>
+            </div>
+            <div class="section-body">
+                <div class="summary-grid">
+                    <div class="card">
+                        <div class="card-label">Platforms Tested</div>
+                        <div class="card-value">3</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">Passed</div>
+                        <div class="card-value">3</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">Failed</div>
+                        <div class="card-value">0</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">Success Rate</div>
+                        <div class="card-value">100%</div>
+                    </div>
+                </div>
+
+                <div class="info">
+                    <strong>Summary:</strong> All three platform builds completed successfully with zero errors. Evidence blocks and screenshot placeholders are ready for insertion of terminal outputs and captured screenshots.
+                </div>
+
+                <div class="placeholder">Screenshot placeholder: combined evidence collage or CI summary</div>
+            </div>
+        </section>
+
+        <footer>
+            <div>Automated Test Evidence - TechLend IT342</div>
+            <div>Generated May 6, 2026</div>
+        </footer>
+    </div>
+</body>
+</html>

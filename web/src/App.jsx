@@ -1,26 +1,26 @@
 import { Routes, Route, Navigate, useLocation } from "react-router-dom"
 import "./App.css"
-import { AuthProvider } from "@/context/AuthContext"
-import { CartProvider } from "@/context/CartContext"
+import { AuthProvider } from "@/shared/context/AuthContext"
+import { CartProvider } from "@/shared/context/CartContext"
 import {
   AdminProtectedRoute,
   GuestRoute,
   StudentProtectedRoute,
-} from "@/components/route-guards"
-import { Navbar } from "@/components/navbar"
-import { CartSheet } from "@/components/cart-sheet"
-import Login from "@/pages/student-instructor/Login"
-import Register from "@/pages/student-instructor/Register"
-import Dashboard from "@/pages/student-instructor/Dashboard"
-import MyLoans from "@/pages/student-instructor/MyLoans"
-import EquipmentDetail from "@/pages/student-instructor/EquipmentDetail"
-import Profile from "@/pages/student-instructor/Profile"
-import AdminLogin from "@/pages/admin-lab-staff/AdminLogin"
-import AdminApprovalQueue from "@/pages/admin-lab-staff/AdminApprovalQueue"
-import AdminActiveLoans from "@/pages/admin-lab-staff/AdminActiveLoans"
-import AdminInventory from "@/pages/admin-lab-staff/AdminInventory"
-import AdminUsers from "@/pages/admin-lab-staff/AdminUsers"
-import AdminIncidents from "@/pages/admin-lab-staff/AdminIncidents"
+} from "@/shared/components/RouteGuards"
+import { Navbar } from "@/shared/components/Navbar"
+import { CartSheet } from "@/features/equipment/components/CartSheet"
+import Login from "@/features/auth/pages/Login"
+import Register from "@/features/auth/pages/Register"
+import Dashboard from "@/features/equipment/pages/Dashboard"
+import MyLoans from "@/features/loan/pages/MyLoans"
+import EquipmentDetail from "@/features/equipment/pages/EquipmentDetail"
+import Profile from "@/features/user/pages/Profile"
+import AdminLogin from "@/features/admin/pages/AdminLogin"
+import AdminApprovalQueue from "@/features/loan/pages/AdminApprovalQueue"
+import AdminActiveLoans from "@/features/loan/pages/AdminActiveLoans"
+import AdminInventory from "@/features/equipment/pages/AdminInventory"
+import AdminUsers from "@/features/user/pages/AdminUsers"
+import AdminIncidents from "@/features/penalty/pages/AdminIncidents"
 
 // Pages where Navbar should be hidden (they have their own layout)
 const noNavbarPaths = new Set(["/login", "/register"])
